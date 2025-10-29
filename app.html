@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <!-- Assicura la viewport corretta per i dispositivi mobili, disabilitando lo zoom -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lume - Connessioni</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Belanosima:wght@400;600;700&family=Covered+By+Your+Grace&family=Dela+Gothic+One&family=Leckerli+One&family=Moirai+One&family=Pixelify+Sans:wght@587&family=Qahiri&family=Righteous&family=Rochester&family=Sigmar&family=Staatliches&display=swap" rel="stylesheet">
+    <!-- Caricamento Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Caricamento Google Font "Inter" -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Stile di base e font */
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            height: 100vh;
+            /* L'overflow è gestito dai contenitori */
+            background-color: #f9fafb; 
+            color: #1f2937;
+        }
+/* Colori personalizzati estratti dal mockup */
+.bg-custom-light-purple {
+    background-color: #F3E8FF;
+}
+
+.rochester-regular {
+  font-family: "Rochester", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+
+.fontTitle{
+    font-family: "Rochester", cursive;
+}
+
+/* Colore uniforme per i pulsanti: #F7BBE1 */
+.bg-custom-pink { 
+    background-color: #F7BBE1;
+    color: #333; /* Aggiungi un colore del testo scuro per il contrasto */
+    border-color: #F7BBE1; /* Imposta il bordo con lo stesso colore */
+}
+.bg-custom-pink:hover {
+     opacity: 0.9;
+}
+
+.txt-custom-pink { 
+    
+    color: #F7BBE1; /* Aggiungi un colore del testo scuro per il contrasto */
+
+}
+
+        /* Contenitore principale delle viste (App Stack) */
+        .app-view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Aggiunge overscroll-y-auto per lo scrolling interno se necessario */
+            overflow-y: auto; 
+            transition: transform 0.35s ease-out, opacity 0.35s;
+            will-change: transform, opacity;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .app-view.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+            z-index: 20;
+        }
+
+        .app-view.slide-from-bottom { transform: translateY(100%); }
+
+        /* Stile Modale "Sheet" (minimalista) */
+        .modal-sheet {
+            transition: transform 0.3s ease-out;
+            transform: translateY(100%);
+        }
+        .modal-sheet.open {
+            transform: translateY(0);
+        }
+
+        /* Stile bolle chat (Minimal) */
+        .bubble-sent {
+            border-bottom-right-radius: 4px; 
+            background-color: #4f46e5; 
+        }
+        .bubble-received {
+            border-bottom-left-radius: 4px;
+            background-color: #e5e7eb; 
+            color: #1f2937;
+        }
+
+        /* Nasconde la scrollbar del contenitore chat */
+        #chat-messages::-webkit-scrollbar { display: none; }
+        #chat-messages { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Icona di trascinamento nel Modale (Minimal) */
+        .handle-bar {
+            width: 40px;
+            height: 4px;
+            background-color: #ccc;
+            border-radius: 2px;
+            margin: 0 auto 1rem auto;
+        }
+    </style>
+</head>
+<body class="h-screen overflow-hidden bg-gray-50 antialiased">
+
+    <!-- Contenitore principale dell'app (shell) -->
+    <div class="relative w-full h-full overflow-hidden max-w-lg mx-auto bg-white shadow-2xl">
+
+        <!-- VISTA: Caricamento Iniziale -->
+        <div id="loading-view" class="app-view visible flex flex-col items-center justify-center h-full bg-white">
+            <svg class="animate-spin h-8 w-8 text-pink mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <h2 class="text-xl font-medium text-gray-800 tracking-wide">Lume</h2>
+            <p class="text-gray-500 mt-1 text-sm">Caricamento...</p>
+        </div>
+
+        <!-- VISTA: Benvenuto (Dal Mockup) -->
+        <div id="welcome-view" class="app-view slide-from-bottom flex flex-col justify-between p-8 bg-white">
+            <div class="flex-grow flex flex-col items-center justify-center text-center">
+                <!-- Mascot e "Hello" -->
+                <div class="relative mb-12 mt-16">
+                    <!-- Segnaposto per Mascot -->
+                    <img src="/images/1761762271275.png" alt="Mascot Placeholder" class="w-48 h-auto mx-auto rounded-lg">
+                    
+                    <!-- Fumetto "Hello" -->
+                    <div class="absolute -top-10 -left-8 transform -rotate-12">
+                        <div class="relative bg-whitr text-white text-lg rounded-full py-3 px-6 ">
+                            
+                            <!-- Triangolo del fumetto -->
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <h1 class="text-4xl font-extrabold text-gray-900 mb-2">Benvenutə in</h1><h1 class="text-6xl font-extrabold txt-custom-pink fontTitle">Lume.</h1>
+
+            </div>
+            
+            <div class="flex-shrink-0">
+                <button id="get-started-btn" class="w-full max-w-md mx-auto p-4 rounded-xl text-gray-900 font-semibold bg-custom-pink transition-opacity duration-300">
+    Inizia
+</button>
+
+                <p class="text-center text-sm text-gray-600 pt-10">
+                    Hai già un account? 
+                    <button id="go-to-signin-link" class="font-bold txt-custom-pink">Login</button>
+                </p>
+            </div>
+        </div>
+
+        <!-- VISTA: Registrazione (Dal Mockup) -->
+        <div id="signup-view" class="app-view slide-from-bottom flex flex-col bg-custom-pink">
+            <!-- Header con mascot -->
+            <div class="p-8
+            1pt-15 flex justify-between items-start flex-shrink-0">
+                <h2 class="text-2xl font-bold text-gray-950"></h2>
+                <!-- Segnaposto per Mascot (peeking) -->
+               
+            </div>
+
+            <!-- Contenitore Form -->
+            <div class="flex-grow bg-white rounded-t-3xl shadow-2xl p-8 overflow-y-auto">
+                <h3 class="text-3xl font-bold txt-custom-pink mb-8">Registrati</h3>
+                
+                <form id="signup-form" class="space-y-5">
+                    <div>
+                        <label for="signup-name" class="block text-sm font-medium text-gray-600 mb-1">Nickname</label>
+                        <input id="signup-name" type="text" placeholder="es. Cheddar 🧀" class="w-full px-4 py-3 text-md rounded-xl border border-gray-200 bg-gray-50 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-pink shadow-sm" required>
+                    </div>
+                    <div>
+                        <label for="signup-email" class="block text-sm font-medium text-gray-600 mb-1">Email</label>
+                        <input id="signup-email" type="email" placeholder="xoushal@uploopstudio.it" class="w-full px-4 py-3 text-md rounded-xl border border-gray-200 bg-gray-50 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-pink shadow-sm" required>
+                    </div>
+                    <div>
+                        <label for="signup-password" class="block text-sm font-medium text-gray-600 mb-1">Password</label>
+                        <input id="signup-password" type="password" placeholder="Lume23!!" class="w-full px-4 py-3 text-md rounded-xl border border-gray-200 bg-gray-50 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-pink shadow-sm" required>
+                    </div>
+                    
+                    <button id="signup-btn" type="submit" class="w-full bg-custom-pink text-gray-900 font-semibold py-4 px-6 rounded-xl shadow-lg transition-all duration-150 hover:bg-custom-pink active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-pink mt-4">
+                        Crea Profilo
+                    </button>
+                </form>
+
+                <div class="flex items-center my-6">
+                    <div class="flex-grow border-t border-gray-200"></div>
+                    <span class="flex-shrink mx-4 text-sm text-gray-400">Or sign up with</span>
+                    <div class="flex-grow border-t border-gray-200"></div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button id="signup-google-btn" class="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 font-medium py-3 px-6 rounded-xl transition-all duration-150 hover:bg-gray-100 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-gray-300 shadow-sm">
+                        <!-- Icona Google (SVG) -->
+                        <svg class="w-5 h-5" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M47.5 24.037C47.5 22.462 47.362 20.937 47.1 19.462H24.475V28.3H37.4C36.962 30.937 35.6 33.15 33.662 34.625V40.275H41.075C45.225 36.337 47.5 30.687 47.5 24.037Z" fill="#4285F4"></path><path d="M24.475 48C31.025 48 36.5 45.862 41.075 40.275H33.662C31.45 41.812 28.275 42.75 24.475 42.75C17.825 42.75 12.012 38.362 10.15 32.325H2.562V38.012C6.9 44.05 15.087 48 24.475 48Z" fill="#34A853"></path><path d="M10.15 32.325C9.65 30.85 9.325 29.287 9.325 27.675C9.325 26.062 9.65 24.5 10.15 22.975V17.287H2.562C.925 20.25 0 23.85 0 27.675C0 31.5 0.925 35.1 2.562 38.012L10.15 32.325Z" fill="#FBBC05"></path><path d="M24.475 9.6C27.9 9.6 31.212 10.762 33.662 13.012L41.15 5.525C36.5 1.5 31.025 0 24.475 0C15.087 0 6.9 3.95 2.562 9.987V17.287H10.15C12.012 11.25 17.825 9.6 24.475 9.6Z" fill="#EA4335"></path></svg>
+                        Google
+                    </button>
+                    <button id="signup-facebook-btn" class="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 font-medium py-3 px-6 rounded-xl transition-all duration-150 hover:bg-gray-100 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-gray-300 shadow-sm">
+                        <!-- Icona Facebook (SVG) -->
+                        <svg class="w-5 h-5 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987H7.897v-2.89H10.438V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562v1.875h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"></path></svg>
+                        Facebook
+                    </button>
+                </div>
+
+                <p class="text-center text-sm text-gray-600 pt-10">
+                    Hai già un account? 
+                    <button id="go-to-signin-link-2" class="font-bold txt-custom-pink">Login</button>
+                </p>
+            </div>
+        </div>
+        
+        <!-- VISTA: Accesso (Basata sul Mockup) -->
+        <div id="signin-view" class="app-view slide-from-bottom flex flex-col bg-custom-pink">
+            <!-- Header -->
+            <div class="p-8 pt-16 flex-shrink-0 bg-custom-pink">
+                <h2 class="text-2xl font-bold text-gray-900"></h2>
+            </div>
+
+            <!-- Contenitore Form -->
+            <div class="flex-grow bg-white rounded-t-3xl shadow-2xl p-8 overflow-y-auto">
+                <h3 class="text-3xl font-bold text-gray-900 mb-8">Sign In</h3>
+                
+                <form id="signin-form" class="space-y-5">
+                    <div>
+                        <label for="signin-email" class="block text-sm font-medium text-gray-600 mb-1">Email Address</label>
+                        <input id="signin-email" type="email" placeholder="example@gmail.com" class="w-full px-4 py-3 text-md rounded-xl border border-gray-200 bg-gray-50 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-pink shadow-sm" required>
+                    </div>
+                    <div>
+                        <label for="signin-password" class="block text-sm font-medium text-gray-600 mb-1">Password</label>
+                        <input id="signin-password" type="password" placeholder="example_1" class="w-full px-4 py-3 text-md rounded-xl border border-gray-200 bg-gray-50 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-pink shadow-sm" required>
+                    </div>
+                    
+                    <button id="signin-btn" type="submit" class="w-full bg-purple-500 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-all duration-150 hover:bg-purple-600 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-purple-500/50 mt-4">
+                        Sign In
+                    </button>
+                </form>
+
+                <div class="flex items-center my-6">
+                    <div class="flex-grow border-t border-gray-200"></div>
+                    <span class="flex-shrink mx-4 text-sm text-gray-400">Or sign in with</span>
+                    <div class="flex-grow border-t border-gray-200"></div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button id="signin-google-btn" class="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 font-medium py-3 px-6 rounded-xl transition-all duration-150 hover:bg-gray-100 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-gray-300 shadow-sm">
+                        <!-- Icona Google (SVG) -->
+                        <svg class="w-5 h-5" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M47.5 24.037C47.5 22.462 47.362 20.937 47.1 19.462H24.475V28.3H37.4C36.962 30.937 35.6 33.15 33.662 34.625V40.275H41.075C45.225 36.337 47.5 30.687 47.5 24.037Z" fill="#4285F4"></path><path d="M24.475 48C31.025 48 36.5 45.862 41.075 40.275H33.662C31.45 41.812 28.275 42.75 24.475 42.75C17.825 42.75 12.012 38.362 10.15 32.325H2.562V38.012C6.9 44.05 15.087 48 24.475 48Z" fill="#34A853"></path><path d="M10.15 32.325C9.65 30.85 9.325 29.287 9.325 27.675C9.325 26.062 9.65 24.5 10.15 22.975V17.287H2.562C.925 20.25 0 23.85 0 27.675C0 31.5 0.925 35.1 2.562 38.012L10.15 32.325Z" fill="#FBBC05"></path><path d="M24.475 9.6C27.9 9.6 31.212 10.762 33.662 13.012L41.15 5.525C36.5 1.5 31.025 0 24.475 0C15.087 0 6.9 3.95 2.562 9.987V17.287H10.15C12.012 11.25 17.825 9.6 24.475 9.6Z" fill="#EA4335"></path></svg>
+                        Google
+                    </button>
+                    <button id="signin-facebook-btn" class="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 font-medium py-3 px-6 rounded-xl transition-all duration-150 hover:bg-gray-100 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-gray-300 shadow-sm">
+                        <!-- Icona Facebook (SVG) -->
+                        <svg class="w-5 h-5 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987H7.897v-2.89H10.438V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562v1.875h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"></path></svg>
+                        Facebook
+                    </button>
+                </div>
+
+                <p class="text-center text-sm text-gray-600 mt-8">
+                    Don't have an account? 
+                    <button id="go-to-signup-link" class="font-bold text-purple-600 hover:underline">Registrati</button>
+                </p>
+            </div>
+        </div>
+
+        <!-- VISTA: Autenticazione (Layout Minimal Modulare) - ORA È LA VISTA DOPO IL LOGIN -->
+        <div id="auth-view" class="app-view slide-from-bottom flex flex-col items-center justify-center p-8 bg-gray-50">
+            
+            <div class="max-w-md w-full text-center">
+                <h1 class="text-5xl font-extrabold text-gray-900 mb-2">Lume</h1>
+                <p class="text-md font-light text-gray-500 mb-10">Connettiti in modo sicuro e istantaneo.</p>
+                
+                <div class="p-6 bg-white rounded-2xl shadow-lg border border-gray-100">
+                    <button id="show-create-tab-button" class="w-full bg-custom-pink text-white font-semibold py-3 px-6 rounded-xl transition-all duration-150 hover:bg-custom-pink active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-pink mb-3">
+                        Crea un Nuovo Codice
+                    </button>
+                    <button id="show-join-tab-button" class="w-full bg-transparent border border-gray-300 text-gray-700 font-medium py-3 px-6 rounded-xl transition-all duration-150 hover:bg-gray-100 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-gray-300">
+                        Unisciti con un Codice
+                    </button>
+                </div>
+
+                <button id="signout-btn" class="mt-8 text-sm text-gray-500 hover:text-red-600 hover:underline">
+                    Sign Out
+                </button>
+            </div>
+        </div>
+
+        <!-- VISTA: App Principale (Chat) -->
+        <div id="main-app-view" class="app-view slide-from-bottom flex flex-col bg-white">
+            <!-- Header Pulito (Nome partner/Status) -->
+            <header class="bg-white border-b border-gray-200 p-4 flex items-center justify-between shadow-sm flex-shrink-0 z-10">
+                <h1 class="text-xl font-extrabold text-gray-900">Chat</h1>
+                <div class="flex items-center space-x-2">
+                    <span id="partner-status" class="text-xs font-medium px-3 py-1 rounded-full text-green-700 bg-green-100">Partner ID...</span>
+                </div>
+            </header>
+            
+            <!-- Contenitore messaggi chat -->
+            <div id="chat-messages" class="flex-grow p-4 pt-1 flex flex-col gap-3 overflow-y-auto bg-gray-50">
+                <!-- I messaggi della chat verranno inseriti qui da JS -->
+            </div>
+            
+            <!-- Footer Input Pulito (Stile iMessage) -->
+            <footer class="p-3 bg-white flex-shrink-0 border-t border-gray-100">
+                <div class="flex gap-2 items-end">
+                    <input id="chat-input" type="text" class="flex-grow w-full px-4 py-2 text-sm rounded-2xl border border-gray-300 bg-gray-50 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-pink focus:border-pink transition-colors" placeholder="iMessage style: Scrivi un messaggio...">
+                    
+                    <button id="send-button" class="bg-custom-pink text-white rounded-full p-2.5 flex-shrink-0 transition-transform duration-100 transform hover:bg-custom-pink active:scale-95 disabled:bg-custom-pink" disabled>
+                        <!-- Icona invio (Freccia) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" transform="rotate(90 12 12)" />
+                        </svg>
+                    </button>
+                </div>
+            </footer>
+        </div>
+
+ <!-- MODALE PRINCIPALE (Sheet Modale - App Stack 2) -->
+        <div id="auth-modal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-end justify-center z-50 transition-opacity duration-300 opacity-0">
+            <div id="modal-sheet-content" class="modal-sheet w-full max-w-lg bg-white rounded-t-3xl shadow-2xl p-6 relative">
+                
+                <!-- Barra di trascinamento/chiusura -->
+                <div class="handle-bar mb-6 cursor-pointer" id="close-modal-handle"></div>
+
+                <!-- Contenuto del Modale a Schede -->
+                <div class="flex flex-col">
+                    <!-- Tab Selector -->
+                    <div class="flex border-b border-gray-200 mb-8">
+                        <button id="tab-create" class="flex-1 text-center py-3 text-sm font-medium border-b-2 transition-all" data-tab="create">Crea</button>
+                        <button id="tab-join" class="flex-1 text-center py-3 text-sm font-medium border-b-2 transition-all" data-tab="join">Unisciti</button>
+                    </div>
+
+                    <!-- Scheda: Crea Codice -->
+                    <div id="tab-content-create" class="tab-content">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2 text-center">Il Tuo Codice</h2>
+                        <p class="text-gray-500 mb-8 text-center">Condividi questo codice segreto per connetterti:</p>
+                        
+                        <div class="bg-gray-100 rounded-xl p-6 mb-8 text-center border border-gray-200">
+                            <span id="code-display" class="text-6xl font-extrabold tracking-widest text-pink">...</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-center space-x-2">
+                            <div class="w-3 h-3 bg-custom-pink rounded-full animate-pulse"></div>
+                            <div class="w-3 h-3 bg-custom-pink rounded-full animate-pulse" style="animation-delay: 0.2s;"></div>
+                            <div class="w-3 h-3 bg-custom-pink rounded-full animate-pulse" style="animation-delay: 0.4s;"></div>
+                        </div>
+                        <p class="text-gray-500 mt-4 text-sm text-center">In attesa che un partner si unisca...</p>
+                    </div>
+
+                    <!-- Scheda: Unisciti con Codice -->
+                    <div id="tab-content-join" class="tab-content hidden">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2 text-center">Inserisci il Codice</h2>
+                        <p class="text-gray-500 mb-6 text-center">Digita il codice di 6 cifre fornito dal tuo partner.</p>
+                        
+                        <input id="code-input" type="number" maxlength="6" class="w-full text-center text-3xl font-bold p-4 rounded-xl border border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-pink focus:border-pink transition-colors" placeholder="000000">
+                        
+                        <button id="join-button" class="w-full bg-pink text-white font-semibold py-4 px-6 rounded-xl transition-all duration-150 hover:bg-custom-pink active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-pink mt-8">
+                            Connettiti
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modale per messaggi/errori (Sostituisce window.alert) -->
+        <div id="message-modal" class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4 z-50 transition-opacity duration-300 opacity-0">
+            <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full text-center transform transition-all scale-95 border border-gray-200">
+                <p id="modal-text" class="text-md text-gray-800 mb-6"></p>
+                <button id="modal-close-button" class="w-full bg-custom-pink text-white font-semibold py-3 px-6 rounded-lg transition-all hover:bg-custom-pinkfocus:outline-none focus:ring-2 focus:ring-pink">
+                    OK
+                </button>
+            </div>
+        </div>
+
+    </div> <!-- Fine del contenitore max-w-lg -->
+
+
+    <!-- Script Firebase e Logica App -->
+    <script type="module">
+        // Importa funzioni Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithCustomToken, 
+            onAuthStateChanged,
+            createUserWithEmailAndPassword, // NUOVO
+            signInWithEmailAndPassword,   // NUOVO
+            signInWithPopup,              // NUOVO
+            GoogleAuthProvider,           // NUOVO
+            FacebookAuthProvider,         // NUOVO
+            signOut                       // NUOVO
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            setDoc, 
+            updateDoc, 
+            onSnapshot, 
+            collection, 
+            addDoc, 
+            query, 
+            serverTimestamp, 
+            setLogLevel,
+            limit
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Variabili Globali (dall'ambiente Canvas) ---
+        
+        // Fallback configuration if canvas environment variables are not set
+        const userFallbackConfig = {
+            apiKey: "AIzaSyDHALYDfyXQIiEzc8IfH7aKjiyXNAWX4_0",
+            authDomain: "amicae-99c7b.firebaseapp.com",
+            projectId: "amicae-99c7b",
+            storageBucket: "amicae-99c7b.firebasestorage.app",
+            messagingSenderId: "379845487963",
+            appId: "1:379845487963:web:e73dc5c970e627676c7e7e",
+            measurementId: "G-LYV92RTCX7"
+        };
+
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' 
+            ? __firebase_config 
+            : JSON.stringify(userFallbackConfig)); 
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Inizializzazione Firebase
+        let app, auth, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            setLogLevel('Debug');
+        } catch (e) {
+            console.error("Errore inizializzazione Firebase:", e);
+            document.getElementById('loading-view').innerHTML = '<h2 class="text-xl font-semibold text-red-600">Errore di configurazione.</h2>';
+        }
+
+        // Stato dell'applicazione
+        let userId = null;
+        let pairingCode = null;
+        let partnerId = null;
+        let pairingListenerUnsubscribe = null;
+        let messagesListenerUnsubscribe = null;
+        let isAuthReady = false; // Stato di prontezza dell'autenticazione
+
+        // Riferimenti DOM
+        const views = {
+            loading: document.getElementById('loading-view'),
+            welcome: document.getElementById('welcome-view'), // NUOVO
+            signup: document.getElementById('signup-view'),   // NUOVO
+            signin: document.getElementById('signin-view'),   // NUOVO
+            auth: document.getElementById('auth-view'),
+            main: document.getElementById('main-app-view')
+        };
+        const modal = document.getElementById('auth-modal');
+        const modalSheetContent = document.getElementById('modal-sheet-content');
+        const codeDisplay = document.getElementById('code-display');
+        const codeInput = document.getElementById('code-input');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const sendButton = document.getElementById('send-button');
+        const partnerStatus = document.getElementById('partner-status');
+
+        // Modale Messaggi
+        const messageModal = document.getElementById('message-modal');
+        const modalText = document.getElementById('modal-text');
+        const modalContent = messageModal.querySelector('div'); 
+
+        // --- Funzioni di Utility ---
+
+        /**
+         * Mostra una vista principale con animazione
+         * @param {string} viewId 'loading', 'auth', etc.
+         */
+        function showView(viewId) {
+            Object.keys(views).forEach(key => {
+                const view = views[key];
+                if (key === viewId) {
+                    view.classList.add('visible');
+                    view.classList.remove('slide-from-bottom');
+                } else {
+                    view.classList.remove('visible');
+                    // Reimposta la posizione di partenza
+                    if (!view.classList.contains('slide-from-bottom')) {
+                        view.classList.add('slide-from-bottom');
+                    }
+                }
+            });
+        }
+
+        /**
+         * Mostra un messaggio modale (sostituto di alert)
+         * @param {string} message Testo da mostrare
+         */
+        function showMessage(message) {
+            // Sostituisci i codici di errore di Firebase con messaggi amichevoli
+            let friendlyMessage = message;
+            if (message.includes("auth/email-already-in-use")) {
+                friendlyMessage = "Questo indirizzo email è già in uso. Prova ad accedere.";
+            } else if (message.includes("auth/wrong-password") || message.includes("auth/user-not-found") || message.includes("auth/invalid-credential")) {
+                friendlyMessage = "Email o password non corretti. Riprova.";
+            } else if (message.includes("auth/weak-password")) {
+                friendlyMessage = "La password deve essere di almeno 6 caratteri.";
+            } else if (message.includes("auth/invalid-email")) {
+                friendlyMessage = "L'indirizzo email non è valido.";
+            } else if (message.includes("auth/popup-closed-by-user")) {
+                friendlyMessage = "Accesso annullato.";
+            }
+            
+            modalText.textContent = friendlyMessage;
+            messageModal.classList.remove('hidden');
+            setTimeout(() => {
+                messageModal.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95');
+            }, 10);
+        }
+
+        // Evento chiusura modale messaggi
+        document.getElementById('modal-close-button').addEventListener('click', () => {
+            messageModal.classList.add('opacity-0');
+            modalContent.classList.add('scale-95');
+            setTimeout(() => messageModal.classList.add('hidden'), 300);
+        });
+
+        // --- Logica Modale Auth (Sheet) ---
+        // (Questa è la logica per il MODALE di pairing, non per il login)
+        
+        function openAuthModal(tab) {
+            if (!isAuthReady || !userId) {
+                showMessage("Devi essere connesso per usare questa funzione.");
+                return;
+            }
+            modal.classList.remove('hidden', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('opacity-100');
+                modalSheetContent.classList.add('open');
+            }, 10);
+            switchTab(tab);
+        }
+
+        function closeAuthModal() {
+            modalSheetContent.classList.remove('open');
+            setTimeout(() => {
+                modal.classList.add('opacity-0');
+                modal.classList.add('hidden');
+            }, 300);
+            if (pairingListenerUnsubscribe) {
+                pairingListenerUnsubscribe();
+                pairingListenerUnsubscribe = null;
+                codeDisplay.textContent = '...';
+            }
+        }
+        document.getElementById('show-create-tab-button').addEventListener('click', () => openAuthModal('create'));
+        document.getElementById('show-join-tab-button').addEventListener('click', () => openAuthModal('join'));
+        document.getElementById('close-modal-handle').addEventListener('click', closeAuthModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target.id === 'auth-modal') closeAuthModal();
+        });
+
+        const tabContents = { create: document.getElementById('tab-content-create'), join: document.getElementById('tab-content-join') };
+        const tabButtons = { create: document.getElementById('tab-create'), join: document.getElementById('tab-join') };
+        
+        function switchTab(tabId) {
+            Object.keys(tabContents).forEach(key => {
+                if (key === tabId) {
+                    tabContents[key].classList.remove('hidden');
+                    tabButtons[key].classList.add('text-pink', 'border-pink');
+                } else {
+                    tabContents[key].classList.add('hidden');
+                    tabButtons[key].classList.remove('text-pink', 'border-pink');
+                    tabButtons[key].classList.add('text-gray-500', 'border-transparent', 'hover:border-gray-300');
+                }
+            });
+            if (tabId === 'join') codeInput.value = '';
+            if (tabId === 'join' && pairingListenerUnsubscribe) {
+                pairingListenerUnsubscribe();
+                pairingListenerUnsubscribe = null;
+                codeDisplay.textContent = '...';
+            }
+            if (tabId === 'create' && !pairingListenerUnsubscribe) {
+                handleCreateConnection();
+            }
+        }
+
+        tabButtons.create.addEventListener('click', () => switchTab('create'));
+        tabButtons.join.addEventListener('click', () => switchTab('join'));
+
+        // --- NUOVA Logica di Autenticazione ---
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("Utente autenticato:", user.uid);
+                userId = user.uid;
+                isAuthReady = true;
+                // Piccolo ritardo per mostrare l'animazione di caricamento
+                // L'utente è loggato, mostra la vista di pairing
+                setTimeout(() => showView('auth'), 500); 
+            } else {
+                console.log("Nessun utente, mostro la welcome view.");
+                userId = null;
+                isAuthReady = true; // L'app è pronta per il login
+                // Piccolo ritardo per mostrare l'animazione di caricamento
+                // Nessun utente, mostra la vista di benvenuto
+                setTimeout(() => showView('welcome'), 500); 
+            }
+        });
+
+        // Tenta il login con token custom se esiste (per ambiente Canvas)
+        (async () => {
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    console.log("Nessun token iniziale, in attesa di login manuale.");
+                }
+            } catch (error) {
+                console.error("Errore con token iniziale:", error);
+                // onAuthStateChanged gestirà e mostrerà 'welcome-view'
+            }
+        })();
+
+        // --- NUOVI Listener per le viste di Login/Registrazione ---
+
+        // Navigazione tra le viste
+        document.getElementById('get-started-btn').addEventListener('click', () => showView('signup'));
+        document.getElementById('go-to-signin-link').addEventListener('click', () => showView('signin'));
+        document.getElementById('go-to-signin-link-2').addEventListener('click', () => showView('signin'));
+        document.getElementById('go-to-signup-link').addEventListener('click', () => showView('signup'));
+
+        // Gestione Form
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                // onAuthStateChanged gestirà la transizione
+            } catch (error) {
+                showMessage(error.message);
+            }
+        });
+
+        document.getElementById('signin-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signin-email').value;
+            const password = document.getElementById('signin-password').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                // onAuthStateChanged gestirà la transizione
+            } catch (error) {
+                showMessage(error.message);
+            }
+        });
+
+        // Gestione Login Social
+        const handleSocialLogin = async (providerName) => {
+            const provider = providerName === 'google' 
+                ? new GoogleAuthProvider() 
+                : new FacebookAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+                // onAuthStateChanged gestirà la transizione
+            } catch (error) {
+                showMessage(error.message);
+            }
+        };
+
+        document.getElementById('signup-google-btn').addEventListener('click', () => handleSocialLogin('google'));
+        document.getElementById('signup-facebook-btn').addEventListener('click', () => handleSocialLogin('facebook'));
+        document.getElementById('signin-google-btn').addEventListener('click', () => handleSocialLogin('google'));
+        document.getElementById('signin-facebook-btn').addEventListener('click', () => handleSocialLogin('facebook'));
+
+        // Gestione Sign Out
+        document.getElementById('signout-btn').addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                // onAuthStateChanged gestirà la transizione a 'welcome-view'
+            } catch (error) {
+                showMessage(error.message);
+            }
+        });
+
+
+        // --- Logica di Connessione (Pairing) ---
+        // (Questa logica è quasi invariata, ma ora dipende da un userId non anonimo)
+
+        async function handleCreateConnection() {
+            if (!userId) return;
+            
+            if (pairingListenerUnsubscribe) pairingListenerUnsubscribe();
+
+            const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+            pairingCode = newCode;
+            
+            const pairDocRef = doc(db, 'artifacts', appId, 'public/data/pairings', pairingCode);
+            
+            try {
+                await setDoc(pairDocRef, {
+                    initiatorId: userId,
+                    status: 'pending',
+                    createdAt: serverTimestamp()
+                });
+                codeDisplay.textContent = pairingCode;
+                listenForPairing(pairDocRef);
+            } catch (error) {
+                console.error("Errore creazione connessione:", error);
+                showMessage("Impossibile creare la connessione. Riprova.");
+                closeAuthModal();
+            }
+        }
+
+        document.getElementById('join-button').addEventListener('click', async () => {
+            if (!userId) return;
+
+            const code = codeInput.value.trim();
+            if (code.length !== 6) {
+                showMessage("Il codice deve essere di 6 cifre.");
+                return;
+            }
+
+            pairingCode = code;
+            const pairDocRef = doc(db, 'artifacts', appId, 'public/data/pairings', pairingCode);
+
+            try {
+                const docSnap = await getDoc(pairDocRef);
+
+                if (!docSnap.exists() || docSnap.data().status !== 'pending') {
+                    showMessage("Codice non valido o già utilizzato.");
+                    return;
+                }
+
+                await updateDoc(pairDocRef, {
+                    joinerId: userId,
+                    status: 'connected'
+                });
+
+                partnerId = docSnap.data().initiatorId;
+                closeAuthModal();
+                showMessage("Connesso! Avvio della chat...");
+                startMainApp();
+
+            } catch (error) {
+                console.error("Errore unione connessione:", error);
+                showMessage("Impossibile unirsi. Controlla il codice.");
+            }
+        });
+
+        function listenForPairing(docRef) {
+            pairingListenerUnsubscribe = onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists() && docSnap.data().status === 'connected') {
+                    partnerId = docSnap.data().joinerId;
+                    if (pairingListenerUnsubscribe) pairingListenerUnsubscribe();
+                    closeAuthModal();
+                    showMessage("Partner connesso! Avvio della chat...");
+                    startMainApp();
+                }
+            }, (error) => {
+                console.error("Errore ascolto pairing:", error);
+                showMessage("Errore di connessione. Riprova.");
+                closeAuthModal();
+            });
+        }
+
+
+        // --- Logica App Principale (Chat) ---
+
+        function startMainApp() {
+            showView('main');
+            listenForMessages();
+            partnerStatus.textContent = `Partner ID: ${partnerId.substring(0, 6)}...`; 
+            sendButton.disabled = false;
+        }
+
+        function listenForMessages() {
+            if (messagesListenerUnsubscribe) messagesListenerUnsubscribe(); 
+
+            const messagesRef = collection(db, 'artifacts', appId, 'public/data/shared', pairingCode, 'messages');
+            const q = query(messagesRef);
+
+            messagesListenerUnsubscribe = onSnapshot(q, (querySnapshot) => {
+                const messages = [];
+                querySnapshot.forEach((doc) => {
+                    messages.push(doc.data());
+                });
+
+                messages.sort((a, b) => {
+                    const timeA = a.timestamp ? a.timestamp.toMillis() : 0;
+                    const timeB = b.timestamp ? b.timestamp.toMillis() : 0;
+                    return timeA - timeB;
+                });
+
+                renderMessages(messages);
+
+            }, (error) => {
+                console.error("Errore ascolto messaggi:", error);
+                showMessage("Errore di connessione alla chat.");
+            });
+        }
+
+        function renderMessages(messages) {
+            chatMessages.innerHTML = ''; 
+            
+            messages.forEach(msg => {
+                const isSender = msg.senderId === userId;
+                
+                const messageWrapper = document.createElement('div');
+                messageWrapper.classList.add('flex', 'w-full');
+                
+                const messageBubble = document.createElement('div');
+                messageBubble.classList.add('p-3', 'rounded-2xl', 'max-w-xs', 'lg:max-w-md', 'text-sm', 'break-words', 'shadow-sm');
+                messageBubble.textContent = msg.text;
+
+                if (isSender) {
+                    messageWrapper.classList.add('justify-end');
+                    messageBubble.classList.add('bg-custom-pink', 'text-white', 'bubble-sent');
+                } else {
+                    messageWrapper.classList.add('justify-start');
+                    messageBubble.classList.add('bg-gray-200', 'text-gray-900', 'bubble-received');
+                }
+                
+                messageWrapper.appendChild(messageBubble);
+                chatMessages.appendChild(messageWrapper);
+            });
+
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const text = chatInput.value.trim();
+            if (text === '' || !userId || !pairingCode) return;
+
+            sendButton.disabled = true;
+            const messagesRef = collection(db, 'artifacts', appId, 'public/data/shared', pairingCode, 'messages');
+
+            try {
+                await addDoc(messagesRef, {
+                    text: text,
+                    senderId: userId,
+                    timestamp: serverTimestamp()
+                });
+                chatInput.value = ''; 
+                sendButton.disabled = false;
+            } catch (error) {
+                console.error("Errore invio messaggio:", error);
+                showMessage("Impossibile inviare il messaggio.");
+                sendButton.disabled = false;
+            }
+        }
+        
+        document.getElementById('send-button').addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault(); 
+                sendMessage();
+            }
+        });
+        
+        // Abilita il pulsante di invio quando c'è testo
+        chatInput.addEventListener('input', () => {
+            if (chatInput.value.trim() !== '') {
+                sendButton.disabled = false;
+            } else {
+                sendButton.disabled = true;
+            }
+        });
+
+    </script>
+</body>
+</html>
