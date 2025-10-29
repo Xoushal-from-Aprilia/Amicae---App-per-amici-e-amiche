@@ -1,1 +1,48 @@
 posizione condivisa
+
+
+ "La Scatola delle Avventure" (Generatore di Attività e Sfide)
+Come spingiamo gli amici a fare cose nuove insieme?
+
+Idee per... Come suggerire attività personalizzate (basate sui loro interessi, tempo libero, budget, distanza).
+
+Idee per... Sfide (giornaliere, settimanali, a tema) che possono completare insieme o "in parallelo".
+
+Idee per... Un sistema di "liste dei desideri" condivise (es. "Posti da visitare", "Film da vedere", "Ristoranti da provare").
+
+
+ "La Capsula del Tempo" (Creazione e Salvataggio di Ricordi)
+Come trasformiamo le attività in ricordi indelebili?
+
+Idee per... Un diario condiviso dove entrambi possono aggiungere foto, video brevi, note vocali e testo.
+
+Idee per... Come documentare le "Avventure" completate (es. caricare una foto prova per completare una sfida).
+
+Idee per... Una funzionalità "Ricordo del Giorno" o "Un anno fa oggi" che ripropone un momento salvato sull'app.
+
+Idee per... "Mappe dei ricordi" dove possono geolocalizzare le loro foto e avventure.
+
+
+
+"Punti Amicizia" (Gamification e Motivazione)
+Come rendiamo l'uso dell'app divertente e costante nel tempo?
+
+Idee per... Un sistema di punti condiviso (non competitivo) che sblocca nuovi temi per l'app o badge.
+
+Idee per... Badge o trofei sbloccabili per traguardi significativi (es. "10 sfide completate", "100 foto caricate", "Amici da 1 anno sull'app").
+
+Idee per... Un "albero dell'amicizia" virtuale che cresce e fiorisce man mano che gli amici interagiscono sull'app e completano attività.
+
+
+
+"Connessione Unica" (Funzionalità Esclusive)
+Cosa può fare quest'app che un semplice WhatsApp o Instagram non fa?
+
+Idee per... Un "Mood Tracker" condiviso e semplificato (es. ogni amico imposta il suo "mood" del giorno) per sapere come sta l'altro a colpo d'occhio.
+
+Idee per... Mini-giochi esclusivi per due giocatori (es. quiz sulla loro amicizia, "Indovina cosa sto disegnando").
+
+Idee per... Un "Pulsante S.O.S." o "Ho bisogno di te" che invia una notifica prioritaria all'amico per momenti di bisogno.
+
+Idee per... "Domande del Giorno" a cui entrambi rispondono in segreto, per poi vedere le risposte l'uno dell'altro.
+
