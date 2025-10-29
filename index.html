@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amicae - Connessi</title>
+    
+    <!-- Script di TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Icone (Font Awesome) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Stile base per il font */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Nasconde le schermate per impostazione predefinita */
+        .screen {
+            display: none;
+        }
+
+        /* Mostra la schermata attiva con un'animazione di fade-in e slide-up */
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Animazione per il "battito cardiaco" */
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        .pulse-animation {
+            animation: pulse 1s ease-in-out;
+        }
+
+        /* Stile per i messaggi della chat */
+        .chat-message {
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        .chat-message.sent {
+            align-self: flex-end;
+            background-color: #dbeafe; /* Tailwind blue-100 */
+        }
+        .chat-message.received {
+            align-self: flex-start;
+            background-color: #f3f4f6; /* Tailwind gray-100 */
+        }
+        
+        /* Stile per lo spinner di caricamento */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #4f46e5; /* Tailwind indigo-600 */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-pink-100 via-purple-100 to-indigo-200 min-h-screen flex items-center justify-center p-4">
+
+    <!-- Contenitore principale dell'app -->
+    <div id="app" class="w-full max-w-md bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-6 sm:p-8 transition-all duration-500 overflow-hidden">
+
+        <!-- Schermata di Caricamento Iniziale -->
+        <div id="loadingScreen" class="screen active text-center">
+            <div class="spinner mx-auto mb-4"></div>
+            <h2 class="text-xl font-semibold text-gray-700">Caricamento...</h2>
+            <p class="text-gray-500">Autenticazione in corso.</p>
+        </div>
+
+        <!-- Schermata di Autenticazione (Scelta) -->
+        <div id="authScreen" class="screen space-y-6">
+            <h1 class="text-3xl font-bold text-center text-gray-800">Benvenuti!</h1>
+            <p class="text-center text-gray-600">Connettiti con la tua persona speciale.</p>
+            <div class="flex flex-col space-y-4">
+                <button id="showCreateCodeBtn" class="w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-indigo-700 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5">
+                    <i class="fas fa-magic-wand-sparkles mr-2"></i>
+                    Crea un Codice
+                </button>
+                <button id="showJoinCodeBtn" class="w-full bg-white text-indigo-600 border border-indigo-600 font-semibold py-3 px-4 rounded-lg shadow-sm hover:bg-indigo-50 transition-all duration-300 ease-in-out">
+                    <i class="fas fa-link mr-2"></i>
+                    Inserisci un Codice
+                </button>
+            </div>
+            <p class="text-xs text-gray-400 text-center pt-4">Il tuo ID utente: <br><code id="userIdDisplay" class="bg-gray-100 p-1 rounded">...</code></p>
+        </div>
+
+        <!-- Schermata per Creare il Codice -->
+        <div id="createCodeScreen" class="screen text-center">
+            <button id="backToAuthBtn1" class="absolute top-4 left-4 text-gray-500 hover:text-gray-800 transition-colors">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Crea un Codice</h2>
+            <p class="text-gray-600 mb-6">Condividi questo codice con il tuo partner per connettervi.</p>
+            <div class="bg-gray-100 rounded-lg p-6 mb-6">
+                <p class="text-5xl font-bold tracking-widest text-indigo-600" id="pairingCodeDisplay">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </p>
+            </div>
+            <p class="text-gray-500">In attesa di connessione...</p>
+        </div>
+
+        <!-- Schermata per Inserire il Codice -->
+        <div id="joinCodeScreen" class="screen">
+            <button id="backToAuthBtn2" class="absolute top-4 left-4 text-gray-500 hover:text-gray-800 transition-colors">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Inserisci Codice</h2>
+            <p class="text-gray-600 mb-6 text-center">Inserisci il codice a 6 cifre del tuo partner.</p>
+            <form id="joinForm" class="space-y-4">
+                <input 
+                    type="tel" 
+                    id="codeInput" 
+                    maxlength="6"
+                    placeholder="123456"
+                    class="w-full text-center text-3xl font-semibold p-4 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-colors"
+                >
+                <button type="submit" id="joinBtn" class="w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-indigo-700 transition-all duration-300 ease-in-out">
+                    Connetti
+                </button>
+            </form>
+            <p id="joinError" class="text-red-500 text-sm text-center mt-4 h-5"></p>
+        </div>
+
+        <!-- Schermata "Connessi" (App Principale) -->
+        <div id="connectedScreen" class="screen space-y-6">
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-indigo-600">Siete Connessi! ❤️</h1>
+                <p class="text-gray-500 text-sm">Connesso con <code id="partnerIdDisplay" class="bg-gray-100 p-1 rounded">...</code></p>
+            </div>
+
+            <!-- Sezione Battito Cardiaco -->
+            <div class="bg-white p-6 rounded-lg shadow-inner text-center">
+                <p class="text-gray-600 mb-4">Invia un "Ti penso"</p>
+                <div id="heartbeatDisplay" class="text-6xl text-red-500 mb-4 transition-transform duration-300 ease-in-out">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <button id="sendHeartbeatBtn" class="w-full bg-pink-500 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-pink-600 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5">
+                    Invia <i class="fas fa-heart"></i>
+                </button>
+                <p id="heartbeatStatus" class="text-sm text-gray-400 mt-3 h-5"></p>
+            </div>
+            
+            <!-- Sezione Chat -->
+            <div class="bg-white p-4 rounded-lg shadow-inner">
+                <h3 class="font-semibold text-lg text-gray-700 mb-2 text-center">Mini Chat</h3>
+                <!-- Contenitore messaggi -->
+                <div id="messagesContainer" class="h-48 overflow-y-auto flex flex-col space-y-3 p-3 bg-gray-50 rounded-lg border">
+                    <!-- I messaggi verranno aggiunti qui -->
+                </div>
+                <!-- Form invio messaggio -->
+                <form id="messageForm" class="flex space-x-2 mt-4">
+                    <input 
+                        type="text" 
+                        id="messageInput"
+                        placeholder="Scrivi un messaggio..."
+                        class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-colors"
+                    >
+                    <button type="submit" class="bg-indigo-600 text-white font-semibold px-5 py-2 rounded-lg shadow-md hover:bg-indigo-700 transition-colors">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Firebase (MODULI) -->
+    <script type="module">
+        // Importa le funzioni necessarie
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            onAuthStateChanged,
+            signInWithCustomToken
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            getDoc, 
+            onSnapshot, 
+            collection, 
+            query, 
+            where, 
+            addDoc, 
+            deleteDoc,
+            getDocs,
+            Timestamp,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Variabili globali per Firebase e stato app
+        let app, auth, db;
+        let userId = null;
+        let partnerId = null;
+        let currentConnectionId = null;
+        
+        let connectionUnsubscribe = null;
+        let messagesUnsubscribe = null;
+        let pairingCodeUnsubscribe = null;
+
+        // Recupera l'ID dell'app dall'ambiente (fornito da Canvas)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-amicae-app';
+        
+        // Percorsi Firestore (secondo le regole di sicurezza)
+        // I codici di abbinamento sono pubblici ma temporanei
+        const getPairingCodesCollection = () => collection(db, 'artifacts', appId, 'public', 'data', 'pairingCodes');
+        // Le connessioni sono pubbliche e permanenti tra i due utenti
+        const getConnectionsCollection = () => collection(db, 'artifacts', appId, 'public', 'data', 'connections');
+
+        // Ottieni elementi DOM
+        const screens = {
+            loading: document.getElementById('loadingScreen'),
+            auth: document.getElementById('authScreen'),
+            create: document.getElementById('createCodeScreen'),
+            join: document.getElementById('joinCodeScreen'),
+            connected: document.getElementById('connectedScreen')
+        };
+        
+        const userIdDisplay = document.getElementById('userIdDisplay');
+        const pairingCodeDisplay = document.getElementById('pairingCodeDisplay');
+        const codeInput = document.getElementById('codeInput');
+        const joinForm = document.getElementById('joinForm');
+        const joinError = document.getElementById('joinError');
+        const partnerIdDisplay = document.getElementById('partnerIdDisplay');
+        const heartbeatDisplay = document.getElementById('heartbeatDisplay');
+        const heartbeatStatus = document.getElementById('heartbeatStatus');
+        const sendHeartbeatBtn = document.getElementById('sendHeartbeatBtn');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageForm = document.getElementById('messageForm');
+        const messageInput = document.getElementById('messageInput');
+
+        // Funzione helper per mostrare una schermata
+        function showScreen(screenId) {
+            Object.values(screens).forEach(screen => {
+                screen.classList.remove('active');
+            });
+            if (screens[screenId]) {
+                screens[screenId].classList.add('active');
+            }
+        }
+
+        // Funzione per formattare i timestamp
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return '...';
+            const date = timestamp.toDate();
+            return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        // Funzione per gestire l'inizializzazione di Firebase e l'autenticazione
+        async function initializeFirebase() {
+            try {
+                // Utilizza la configurazione Firebase fornita dall'ambiente
+                const firebaseConfig = JSON.parse(__firebase_config);
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                // Ascolta i cambiamenti dello stato di autenticazione
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        // Utente autenticato (anonimamente o con token)
+                        userId = user.uid;
+                        userIdDisplay.textContent = userId;
+                        console.log("Utente autenticato:", userId);
+                        
+                        // Controlla se esiste già una connessione
+                        await checkExistingConnection();
+                    } else {
+                        // Nessun utente, prova ad autenticarti
+                        console.log("Nessun utente, tentativo di autenticazione...");
+                        try {
+                            // Utilizza il token personalizzato se fornito (ambiente Canvas)
+                            if (typeof __initial_auth_token !== 'undefined') {
+                                await signInWithCustomToken(auth, __initial_auth_token);
+                            } else {
+                                // Altrimenti, usa l'autenticazione anonima
+                                await signInAnonymously(auth);
+                            }
+                        } catch (authError) {
+                            console.error("Errore di autenticazione:", authError);
+                            screens.loading.innerHTML = "<p class='text-red-500'>Errore di autenticazione.</p>";
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error("Errore nell'inizializzazione di Firebase:", e);
+                screens.loading.innerHTML = "<p class='text-red-500'>Impossibile caricare Firebase.</p>";
+            }
+        }
+
+        // Controlla se l'utente è già connesso a qualcuno
+        async function checkExistingConnection() {
+            if (!userId) return;
+
+            console.log("Controllo connessioni esistenti per:", userId);
+            const q = query(getConnectionsCollection(), where("members", "array-contains", userId));
+            
+            try {
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    // Trovata una connessione
+                    const connectionDoc = querySnapshot.docs[0];
+                    const connectionData = connectionDoc.data();
+                    
+                    currentConnectionId = connectionDoc.id;
+                    partnerId = connectionData.members.find(id => id !== userId);
+                    
+                    console.log(`Connessione trovata: ${currentConnectionId} con partner: ${partnerId}`);
+                    setupConnectedScreen(currentConnectionId, partnerId);
+                } else {
+                    // Nessuna connessione, mostra la schermata di scelta
+                    console.log("Nessuna connessione trovata.");
+                    showScreen('auth');
+                }
+            } catch (error) {
+                console.error("Errore nel controllo della connessione:", error);
+                showScreen('auth'); // Torna alla auth in caso di errore
+            }
+        }
+
+// Logica per unirsi a un codice
+        async function handleJoinCode(e) {
+            e.preventDefault();
+            const code = codeInput.value.trim();
+            joinError.textContent = '';
+            
+            if (code.length !== 6) {
+                joinError.textContent = 'Il codice deve essere di 6 cifre.';
+                return;
+            }
+
+            console.log(`Tentativo di join con codice: ${code}`);
+            const codeDocRef = doc(getPairingCodesCollection(), code);
+
+            try {
+                const codeDoc = await getDoc(codeDocRef);
+
+                if (!codeDoc.exists()) {
+                    joinError.textContent = 'Codice non valido o scaduto.';
+                    return;
+                }
+
+                const creatorId = codeDoc.data().creatorId;
+                if (creatorId === userId) {
+                    joinError.textContent = 'Non puoi connetterti con te stesso.';
+                    return;
+                }
+                
+                // Trovato, crea la connessione
+                console.log(`Codice valido, connessione con: ${creatorId}`);
+                
+                const newConnectionRef = await addDoc(getConnectionsCollection(), {
+                    members: [creatorId, userId],
+                    createdAt: serverTimestamp(),
+                    lastHeartbeat: null,
+                    lastSender: null
+                });
+
+                currentConnectionId = newConnectionRef.id;
+                partnerId = creatorId;
+
+                // Pulisci il codice di abbinamento
+                await deleteDoc(codeDocRef);
+                
+                console.log(`Connessione creata: ${currentConnectionId}`);
+                setupConnectedScreen(currentConnectionId, partnerId);
+
+            } catch (error) {
+                console.error("Errore nel join:", error);
+                joinError.textContent = 'Errore durante la connessione.';
+            }
+        }
+
+        // Imposta la schermata "Connessi" e avvia i listener
+        function setupConnectedScreen(connId, pId) {
+            console.log(`Setup schermata connessi: connId=${connId}, pId=${pId}`);
+            partnerIdDisplay.textContent = pId.substring(0, 8) + '...';
+            showScreen('connected');
+
+            const connectionDocRef = doc(getConnectionsCollection(), connId);
+
+            // Pulisci vecchi listener se esistono
+            if (connectionUnsubscribe) connectionUnsubscribe();
+            if (messagesUnsubscribe) messagesUnsubscribe();
+
+            // 1. Listener per il documento di connessione (per Heartbeat)
+            connectionUnsubscribe = onSnapshot(connectionDocRef, (doc) => {
+                if (!doc.exists()) {
+                    // La connessione è stata eliminata? (Non implementato, ma buona norma)
+                    console.warn("La connessione è sparita!");
+                    resetApp();
+                    return;
+                }
+                
+                const data = doc.data();
+                if (data.lastHeartbeat && data.lastSender) {
+                    const statusText = `Ultimo <i class="fas fa-heart text-pink-500"></i> ricevuto da ${data.lastSender === userId ? 'te' : 'loro'} alle ${formatTimestamp(data.lastHeartbeat)}`;
+                    heartbeatStatus.innerHTML = statusText;
+
+                    // Mostra animazione pulse se non l'hai inviato tu
+                    if (data.lastSender !== userId) {
+                        heartbeatDisplay.classList.add('pulse-animation');
+                        setTimeout(() => {
+                            heartbeatDisplay.classList.remove('pulse-animation');
+                        }, 1000);
+                    }
+                }
+            });
+
+            // 2. Listener per la sottocollezione "messages"
+            const messagesColRef = collection(connectionDocRef, "messages");
+            // Nota: le query Firestore complesse (come orderBy) richiedono indici.
+            // Per semplicità, non usiamo orderBy e ordiniamo lato client.
+            // In un'app reale, si userebbe: query(messagesColRef, orderBy("createdAt", "asc"), limit(50))
+            
+            messagesUnsubscribe = onSnapshot(query(messagesColRef), (snapshot) => {
+                const messages = [];
+                snapshot.forEach(doc => {
+                    messages.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Ordina per timestamp (se esiste)
+                messages.sort((a, b) => {
+                    const timeA = a.createdAt ? a.createdAt.toMillis() : 0;
+                    const timeB = b.createdAt ? b.createdAt.toMillis() : 0;
+                    return timeA - timeB;
+                });
+
+                renderMessages(messages);
+            });
+        }
+
+        // Renderizza i messaggi nella chat
+        function renderMessages(messages) {
+            messagesContainer.innerHTML = '';
+            messages.forEach(msg => {
+                const isSent = msg.senderId === userId;
+                const msgClass = isSent ? 'sent' : 'received';
+                
+                const msgElement = document.createElement('div');
+                msgElement.className = `chat-message p-3 rounded-lg ${msgClass}`;
+                
+                const text = document.createElement('p');
+                text.textContent = msg.text;
+                
+                const time = document.createElement('span');
+                time.className = 'text-xs text-gray-500 block text-right mt-1';
+                time.textContent = formatTimestamp(msg.createdAt);
+                
+                msgElement.appendChild(text);
+                msgElement.appendChild(time);
+                messagesContainer.appendChild(msgElement);
+            });
+            // Scrolla in fondo
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Invia un messaggio
+        async function handleSendMessage(e) {
+            e.preventDefault();
+            const text = messageInput.value.trim();
+            if (text === '' || !currentConnectionId || !userId) return;
+
+            messageInput.value = '';
+            
+            try {
+                const messagesColRef = collection(db, 'artifacts', appId, 'public', 'data', 'connections', currentConnectionId, 'messages');
+                await addDoc(messagesColRef, {
+                    text: text,
+                    senderId: userId,
+                    createdAt: serverTimestamp()
+                });
+            } catch (error) {
+                console.error("Errore nell'invio del messaggio:", error);
+                // Rimetti il testo se l'invio fallisce?
+                messageInput.value = text;
+            }
+        }
+
+        // Invia un "battito"
+        async function handleSendHeartbeat() {
+            if (!currentConnectionId || !userId) return;
+            
+            try {
+                const connectionDocRef = doc(getConnectionsCollection(), currentConnectionId);
+                await setDoc(connectionDocRef, {
+                    lastHeartbeat: serverTimestamp(),
+                    lastSender: userId
+                }, { merge: true }); // merge: true per non sovrascrivere altri campi (es. 'members')
+                
+                console.log("Battito inviato!");
+            } catch (error) {
+                console.error("Errore nell'invio del battito:", error);
+            }
+        }
+        
+        // Resetta lo stato dell'app (es. se la connessione si interrompe)
+        function resetApp() {
+            if (connectionUnsubscribe) connectionUnsubscribe();
+            if (messagesUnsubscribe) messagesUnsubscribe();
+            if (pairingCodeUnsubscribe) pairingCodeUnsubscribe();
+            
+            userId = auth.currentUser ? auth.currentUser.uid : null;
+            partnerId = null;
+            currentConnectionId = null;
+            
+            showScreen('auth');
+        }
+
+        // Event Listener Principali
+        document.getElementById('showCreateCodeBtn').addEventListener('click', handleCreateCode);
+        document.getElementById('showJoinCodeBtn').addEventListener('click', () => showScreen('join'));
+        document.getElementById('backToAuthBtn1').addEventListener('click', resetApp);
+        document.getElementById('backToAuthBtn2').addEventListener('click', resetApp);
+        
+        joinForm.addEventListener('submit', handleJoinCode);
+        messageForm.addEventListener('submit', handleSendMessage);
+        sendHeartbeatBtn.addEventListener('click', handleSendHeartbeat);
+
+        // Avvia l'app quando la finestra è caricata
+        window.onload = initializeFirebase;
+
+    </script>
+</body>
+</html>
