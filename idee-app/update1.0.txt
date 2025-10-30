@@ -46,3 +46,15 @@ Idee per... Un "Pulsante S.O.S." o "Ho bisogno di te" che invia una notifica pri
 
 Idee per... "Domande del Giorno" a cui entrambi rispondono in segreto, per poi vedere le risposte l'uno dell'altro.
 
+
+
+"Foto del Giorno"
+
+Prompt: "Invia una foto di qualsiasi cosa tu stia facendo in questo preciso momento."
+
+Perché: È un modo veloce per sentirsi parte della vita quotidiana dell'altro (la scrivania, il caffè, il gatto).
+
+
+
+
+
