@@ -1,9 +1,9 @@
-# 🚀 Nome del Progetto
+# 🌷 AMICAE - l'App per amici e coppie
+Questa è un'app template per amici e fidanzati che tu potrai scaricare, utilizzare e modificare a tuo piacimento.
 
-Breve descrizione del progetto. Spiega in una o due frasi di cosa si tratta e a cosa serve.
+Questo progetto è stato realizzato da Christian "Xoushal" Vedovi.
 
 ## ✨ Caratteristiche
-
 * **Funzionalità 1:** Descrivi una caratteristica chiave.
 * **Funzionalità 2:** Descrivi un'altra caratteristica chiave.
 * **Funzionalità N:** Aggiungi quante ne servono.
