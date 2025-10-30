@@ -1,30 +1,42 @@
 # 🌷 AMICAE - l'App per amici e coppie
 Questa è un'app template per amici e fidanzati che tu potrai scaricare, utilizzare e modificare a tuo piacimento.
 
-Questo progetto è stato realizzato da Christian "Xoushal" Vedovi.
+Questo progetto è stato realizzato con amore da Christian "Xoushal" Vedovi.
 
 ## ✨ Caratteristiche
-* **Funzionalità 1:** Descrivi una caratteristica chiave.
-* **Funzionalità 2:** Descrivi un'altra caratteristica chiave.
-* **Funzionalità N:** Aggiungi quante ne servono.
+* **Code Pairing:** I due utenti si collegano tramite un codice all'inizio.
+* **Multifunzione:** Oltre 4 tipi di attività da fare in coppia.
+* **Connetion-Made:** Tutte le funzioni sono studiate per rafforzare il legame tra i due utenti.
 
 ## 🛠️ Installazione
+Una guida passo passo su come installare e configurare l'ambiente di sviluppo e l'applicazione.
 
-Una guida passo passo su come installare e configurare l'ambiente di sviluppo o l'applicazione.
+1.  Clona la Repo:
+    ```bash
+    Esegui una Fork del progetto direttamente su GitHub.
+    ```
+2.  Controlla che tutti i file siano stati correttamente importate:
+    ```bash
+    Visualizza la scheda "Le mie Repositories" dal tuo profilo.
+    Cerca una Repo chiamata "Amicae..."
+    ```
+3.  Seleziona un'ambiente di Sviluppo:
+    ```bash
+   1. Visual Studio Code
+   2. Spck Editor
+   3. GitHub Workspace
+   4. Uno a caso che scegli tu
+    ```
 
-1.  Clona il repository:
-    ```bash
-    git clone [https://github.com/tuo-nome-utente/nome-del-progetto.git](https://github.com/tuo-nome-utente/nome-del-progetto.git)
-    cd nome-del-progetto
-    ```
-2.  Installa le dipendenze (esempio con `npm`):
-    ```bash
-    npm install
-    ```
-3.  Esegui l'applicazione (se applicabile):
-    ```bash
-    npm start
-    ```
+4.  Collega la repo all'Ambiente di Sviluppo:
+    ```bash 
+    (Nel caso di SPCK Editor)
+    1. Crea Progetto
+    2. Vai su "Source Control"
+    3. Crea un Remote (inserendo Il link della repo non originale, usa il tuo)
+    4. Effettua le tue modifiche e caricale cliccando su "Push"
+    
+
 
 ## 💡 Utilizzo
 
