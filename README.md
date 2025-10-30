@@ -45,3 +45,6 @@ Esempi di come usare il progetto. Includi snippet di codice se necessario.
 // Esempio di utilizzo del codice
 const risultato = nomeDellaFunzione(parametro);
 console.log(risultato);
+
+
+![Logo Amicae](/github/amicae-logo.png)
