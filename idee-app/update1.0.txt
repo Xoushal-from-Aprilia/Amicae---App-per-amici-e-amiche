@@ -84,5 +84,22 @@ Prompt: "Aggiungi una canzone che ti ricorda il tuo amico (e digli perché
 
 
 
+"Il Vasetto della Gratitudine"
+
+Prompt: "Scrivi una cosa per cui sei grato riguardo al tuo amico oggi."
+
+Come funziona: I messaggi vengono salvati in un "vasetto" virtuale che può essere "aperto" e letto in qualsiasi momento.
+
+
+
+
+"Campanello d'Allarme 'Friend-iversario'"
+
+Come funziona: L'app chiede di impostare la data del vostro "Anniversario di Amicizia" (o il compleanno dell'altro). Invia un promemoria per celebrare.
+
+
+
+
+
 
 
