@@ -21,12 +21,12 @@ Una guida passo passo su come installare e configurare l'ambiente di sviluppo e 
     Cerca una Repo chiamata "Amicae..."
     ```
 3.  Seleziona un'ambiente di Sviluppo:
-    ```bash
+```bash
    1. Visual Studio Code
    2. Spck Editor
    3. GitHub Workspace
-   4. Uno a caso che scegli tu
-    ```
+   4. Uno a caso che scegli tu...
+  ```
 
 4.  Collega la repo all'Ambiente di Sviluppo:
     ```bash 
@@ -35,7 +35,7 @@ Una guida passo passo su come installare e configurare l'ambiente di sviluppo e 
     2. Vai su "Source Control"
     3. Crea un Remote (inserendo Il link della repo non originale, usa il tuo)
     4. Effettua le tue modifiche e caricale cliccando su "Push"
-    
+    ```
 
 
 ## 💡 Utilizzo
