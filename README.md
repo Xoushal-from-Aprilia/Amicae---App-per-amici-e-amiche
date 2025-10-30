@@ -1,3 +1,5 @@
+![Logo Amicae](/github/amicae-logo.png)
+
 # 🌷 AMICAE - l'App per amici e coppie
 Questa è un'app template per amici e fidanzati che tu potrai scaricare, utilizzare e modificare a tuo piacimento.
 
@@ -43,4 +45,3 @@ Esempi di come usare il progetto. Includi snippet di codice se necessario.
 
 
 
-![Logo Amicae](/github/amicae-logo.png)
