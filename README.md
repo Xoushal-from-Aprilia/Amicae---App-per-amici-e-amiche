@@ -10,12 +10,11 @@ Questo progetto è stato realizzato con amore da Christian "Xoushal" Vedovi.
 
 ## 🛠️ Installazione
 Una guida passo passo su come installare e configurare l'ambiente di sviluppo e l'applicazione.
-
 1.  Clona la Repo:
     ```bash
     Esegui una Fork del progetto direttamente su GitHub.
     ```
-2.  Controlla che tutti i file siano stati correttamente importate:
+2.  Controlla che tutti i file siano stati correttamente importati:
     ```bash
     Visualizza la scheda "Le mie Repositories" dal tuo profilo.
     Cerca una Repo chiamata "Amicae..."
