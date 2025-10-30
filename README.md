@@ -41,10 +41,6 @@ Una guida passo passo su come installare e configurare l'ambiente di sviluppo e 
 
 Esempi di come usare il progetto. Includi snippet di codice se necessario.
 
-```javascript
-// Esempio di utilizzo del codice
-const risultato = nomeDellaFunzione(parametro);
-console.log(risultato);
 
 
 ![Logo Amicae](/github/amicae-logo.png)
