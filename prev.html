@@ -29,15 +29,6 @@
     background-color: #F3E8FF;
 }
 
-        /* Nasconde la scrollbar */
-        .app-view::-webkit-scrollbar { display: none; }
-        .app-view { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* NUOVO: Nasconde scrollbar per carosello eventi */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-
 .rochester-regular {
   font-family: "Rochester", cursive;
   font-weight: 400;
@@ -307,27 +298,26 @@
             
             <div class="flex-grow p-6 rounded-t-3xl shadow-2xl overflow-y-auto ">
                 
-                                <!-- SEZIONE EVENTI DINAMICA -->
                 <div class="mb-8">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-2xl font-bold text-gray-800">Eventi in Arrivo</h2>
-                        <!-- NUOVO: Pulsante Aggiungi Evento -->
-                        <button id="add-event-btn" class="bg-custom-pink text-gray-900 rounded-full w-8 h-8 flex items-center justify-center shadow-lg transition-transform active:scale-95">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </div>
-                    
-                    <!-- NUOVO: Carosello Eventi -->
-                    <div id="events-carousel" class="flex overflow-x-auto space-x-4 pb-4 no-scrollbar" style="scroll-snap-type: x mandatory;">
-                        <!-- Gli eventi verranno iniettati qui da JS -->
-                        <div class="p-5 text-center text-gray-500 w-full">
-                            Caricamento eventi...
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Eventi in Arrivo</h2>
+                    <div class="bg-white p-5 rounded-2xl shadow-lg border border-gray-100">
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <h3 class="font-bold text-lg text-gray-900">Cena Romantica</h3>
+                                <p class="text-sm text-gray-500">Venerdì 20 Dicembre, 20:30</p>
+                            </div>
+                            <div class="text-center">
+                                <span class="block text-3xl font-bold text-custom-pink">20</span>
+                                <span class="block text-xs font-medium text-gray-500 uppercase">DIC</span>
+                            </div>
                         </div>
+                        <p class="text-sm text-gray-600">Ricordati di prenotare il ristorante "La Lanterna"!</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-lg border border-gray-100 mt-4">
+                         <h3 class="font-bold text-lg text-gray-900">Cinema</h3>
+                         <p class="text-sm text-gray-500">Sabato 21 Dicembre, 21:00</p>
                     </div>
                 </div>
-
 
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800 mb-4">Le Nostre Attività</h2>
@@ -428,52 +418,6 @@
                 </button>
             </div>
         </div>
-        
-
-
-        <!-- NUOVO: MODALE AGGIUNGI EVENTO -->
-        <div id="add-event-modal" class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4 z-50 transition-opacity duration-300 opacity-0">
-            <div id="add-event-modal-content" class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full transform transition-all scale-95 border border-gray-200">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xl font-bold text-gray-900">Nuovo Evento</h3>
-                    <button id="close-event-modal-btn" class="text-gray-400 hover:text-gray-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                
-                <form id="add-event-form" class="space-y-4">
-                    <div>
-                        <label for="event-title" class="block text-sm font-medium text-gray-600 mb-1">Titolo</label>
-                        <input id="event-title" type="text" placeholder="es. Cena fuori" class="w-full px-4 py-3 text-md rounded-xl border border-gray-200 bg-gray-50 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-pink shadow-sm" required>
-                    </div>
-                    <div class="flex space-x-2">
-                        <div class="flex-1">
-                            <label for="event-date" class="block text-sm font-medium text-gray-600 mb-1">Data</label>
-                            <input id="event-date" type="date" class="w-full px-4 py-3 text-md rounded-xl border border-gray-200 bg-gray-50 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-pink shadow-sm" required>
-                        </div>
-                        <div class="flex-1">
-                            <label for="event-time" class="block text-sm font-medium text-gray-600 mb-1">Ora</label>
-                            <input id="event-time" type="time" class="w-full px-4 py-3 text-md rounded-xl border border-gray-200 bg-gray-50 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-pink shadow-sm" required>
-                        </div>
-                    </div>
-                    <div>
-                        <label for="event-description" class="block text-sm font-medium text-gray-600 mb-1">Descrizione (opzionale)</label>
-                        <textarea id="event-description" rows="2" placeholder="Ricordati di prenotare!" class="w-full px-4 py-3 text-md rounded-xl border border-gray-200 bg-gray-50 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-pink shadow-sm"></textarea>
-                    </div>
-                    
-                    <button id="save-event-btn" type="submit" class="w-full bg-custom-pink text-gray-900 font-semibold py-4 px-6 rounded-xl shadow-lg transition-all duration-150 hover:bg-custom-pink active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-pink/50 mt-4">
-                        Salva Evento
-                    </button>
-                </form>
-            </div>
-        </div>
-
-
-    </div> 
-    
-    
 
     </div> <script type="module">
         // Importa funzioni Firebase
@@ -502,8 +446,7 @@
             query, 
             serverTimestamp, 
             setLogLevel,
-            limit,
-            orderBy
+            limit
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Variabili Globali (dall'ambiente Canvas) ---
@@ -543,12 +486,9 @@
         let pairingCode = null;
         let partnerId = null;
         let pairingListenerUnsubscribe = null;
-                
-        
-        let isAuthReady = false; 
-
         // let messagesListenerUnsubscribe = null; // RIMOSSO
-        
+        let isAuthReady = false; // Stato di prontezza dell'autenticazione
+
         // Riferimenti DOM
         const views = {
             loading: document.getElementById('loading-view'),
@@ -572,13 +512,6 @@
         const modalText = document.getElementById('modal-text');
         const modalContent = messageModal.querySelector('div'); 
 
-// NUOVO: Riferimenti Modale Eventi
-        const addEventModal = document.getElementById('add-event-modal');
-        const addEventModalContent = document.getElementById('add-event-modal-content');
-        const addEventBtn = document.getElementById('add-event-btn');
-        const closeEventModalBtn = document.getElementById('close-event-modal-btn');
-        const addEventForm = document.getElementById('add-event-form');
-        const eventsCarousel = document.getElementById('events-carousel');
         // --- Funzioni di Utility ---
 
         /**
@@ -857,20 +790,6 @@
                 showMessage("Impossibile unirsi. Controlla il codice.");
             }
         });
-        
-                document.getElementById('signout-btn').addEventListener('click', async () => {
-            try {
-                await signOut(auth);
-                // ... (codice esistente per resettare state)
-                if (pairingListenerUnsubscribe) pairingListenerUnsubscribe();
-                if (eventsListenerUnsubscribe) eventsListenerUnsubscribe(); // <-- AGGIUNGI QUESTA RIGA
-                pairingListenerUnsubscribe = null;
-                eventsListenerUnsubscribe = null; // <-- AGGIUNGI QUESTA RIGA
-            } catch (error) {
-                showMessage(error.message);
-            }
-        });
-
 
         function listenForPairing(docRef) {
             pairingListenerUnsubscribe = onSnapshot(docRef, (docSnap) => {
@@ -900,191 +819,6 @@
         }
 
         // (Tutta la logica della chat è stata rimossa)
-        
-        
-                // --- NUOVA: Logica Eventi ---
-
-        /**
-         * Formatta una stringa data ISO (es. 2025-12-20T20:30) in un formato leggibile.
-         * @param {string} isoString
-         * @returns {string} Data formattata (es. "ven 20 dic, 20:30")
-         */
-        function formatEventDate(isoString) {
-            if (!isoString) return "Data non specificata";
-            try {
-                const date = new Date(isoString);
-                const options = {
-                    weekday: 'short',
-                    day: 'numeric',
-                    month: 'short',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false
-                };
-                let formatted = new Intl.DateTimeFormat('it-IT', options).format(date);
-                // Pulisce la formattazione (es. rimuove "alle")
-                formatted = formatted.replace('alle', '');
-                return formatted;
-            } catch (e) {
-                console.error("Errore formattazione data:", e);
-                return "Data non valida";
-            }
-        }
-        
-        /**
-         * Si mette in ascolto degli eventi condivisi sulla connessione.
-         */
-        function listenForEvents() {
-            if (!pairingCode) return;
-            if (eventsListenerUnsubscribe) eventsListenerUnsubscribe();
-
-            const eventsCollectionRef = collection(db, 'artifacts', appId, 'public/data/pairings', pairingCode, 'events');
-            // Ordina per data evento, dal più vicino al più lontano
-            const q = query(eventsCollectionRef, orderBy("eventDate", "asc"));
-
-            eventsListenerUnsubscribe = onSnapshot(q, (snapshot) => {
-                renderEvents(snapshot.docs);
-            }, (error) => {
-                console.error("Errore ascolto eventi:", error);
-                eventsCarousel.innerHTML = '<div class="p-5 text-center text-red-500 w-full">Errore nel caricare gli eventi.</div>';
-            });
-        }
-
-        /**
-         * Renderizza la lista di eventi nel carosello.
-         * @param {Array} docs Array di documenti (eventi) da Firestore.
-         */
-        function renderEvents(docs) {
-            eventsCarousel.innerHTML = ''; // Pulisce il carosello
-
-            if (docs.length === 0) {
-                eventsCarousel.innerHTML = `
-                    <div class="flex-shrink-0 w-full text-center p-5">
-                        <p class="text-gray-500">Nessun evento in programma.</p>
-                        <p class="text-gray-400 text-sm">Aggiungine uno con il tasto '+'!</p>
-                    </div>
-                `;
-                return;
-            }
-
-            // Filtra eventi passati (opzionale, ma utile)
-            const now = new Date();
-            const upcomingDocs = docs.filter(doc => new Date(doc.data().eventDate) >= now);
-
-            if (upcomingDocs.length === 0) {
-                eventsCarousel.innerHTML = `
-                    <div class="flex-shrink-0 w-full text-center p-5">
-                        <p class="text-gray-500">Nessun evento futuro.</p>
-                         <p class="text-gray-400 text-sm">Aggiungine uno nuovo!</p>
-                    </div>
-                `;
-                 return;
-            }
-
-            upcomingDocs.forEach(doc => {
-                const event = doc.data();
-                const eventDate = new Date(event.eventDate);
-
-                // Formattazione per il "datario"
-                const day = eventDate.getDate();
-                const month = eventDate.toLocaleString('it-IT', { month: 'short' }).toUpperCase().replace('.', '');
-
-                // Formattazione per la data leggibile
-                const fullFormattedDate = formatEventDate(event.eventDate);
-
-
-                const eventCardHTML = `
-                    <div class="flex-shrink-0 w-4/5 max-w-xs bg-white p-5 rounded-2xl shadow-lg border border-gray-100" style="scroll-snap-align: start;">
-                        <div class="flex items-center justify-between mb-3">
-                            <div>
-                                <h3 class="font-bold text-lg text-gray-900 truncate">${event.title}</h3>
-                                <p class="text-sm text-custom-pink font-medium">${fullFormattedDate}</p>
-                            </div>
-                            <div class="text-center flex-shrink-0 ml-4">
-                                <span class="block text-3xl font-bold text-custom-pink">${day}</span>
-                                <span class="block text-xs font-medium text-gray-500 uppercase">${month}</span>
-                            </div>
-                        </div>
-                        ${event.description ? `<p class="text-sm text-gray-600">${event.description}</p>` : ''}
-                    </div>
-                `;
-                eventsCarousel.innerHTML += eventCardHTML;
-            });
-        }
-
-        // --- Listener Modale Eventi ---
-        
-        function openEventModal() {
-            addEventForm.reset(); // Pulisce il form
-            addEventModal.classList.remove('hidden');
-            setTimeout(() => {
-                addEventModal.classList.remove('opacity-0');
-                addEventModalContent.classList.remove('scale-95');
-            }, 10);
-        }
-        
-        function closeEventModal() {
-            addEventModal.classList.add('opacity-0');
-            addEventModalContent.classList.add('scale-95');
-            setTimeout(() => addEventModal.classList.add('hidden'), 300);
-        }
-
-        addEventBtn.addEventListener('click', openEventModal);
-        closeEventModalBtn.addEventListener('click', closeEventModal);
-        
-        // Clicca fuori per chiudere (solo per modale eventi)
-        addEventModal.addEventListener('click', (e) => {
-            if (e.target.id === 'add-event-modal') closeEventModal();
-        });
-
-
-        // Gestione salvataggio evento
-        addEventForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!pairingCode) {
-                showMessage("Errore: Connessione non trovata.");
-                return;
-            }
-
-            const title = document.getElementById('event-title').value;
-            const date = document.getElementById('event-date').value;
-            const time = document.getElementById('event-time').value;
-            const description = document.getElementById('event-description').value;
-            
-            // Combina data e ora in una stringa ISO 8601 valida (es: 2025-12-20T14:30)
-            const eventDateISO = `${date}T${time}`;
-
-            // Validazione base
-            if (!title || !date || !time) {
-                showMessage("Titolo, data e ora sono obbligatori.");
-                return;
-            }
-            if (new Date(eventDateISO) < new Date()) {
-                showMessage("Non puoi aggiungere un evento nel passato.");
-                return;
-            }
-
-            try {
-                // Salva l'evento nella sottocollezione del pairing
-                const eventsCollectionRef = collection(db, 'artifacts', appId, 'public/data/pairings', pairingCode, 'events');
-                
-                await addDoc(eventsCollectionRef, {
-                    title: title,
-                    eventDate: eventDateISO,
-                    description: description,
-                    createdBy: userId,
-                    createdAt: serverTimestamp()
-                });
-
-                showMessage("Evento aggiunto con successo!");
-                closeEventModal();
-
-            } catch (error) {
-                console.error("Errore salvataggio evento: ", error);
-                showMessage("Impossibile salvare l'evento. Riprova.");
-            }
-        });
-
 
     </script>
 </body>
