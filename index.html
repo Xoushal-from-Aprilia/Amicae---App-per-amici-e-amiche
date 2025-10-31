@@ -969,8 +969,14 @@
             }
 
             // Filtra eventi passati (opzionale, ma utile)
+                        // Filtra eventi passati (considerando solo la data odierna)
             const now = new Date();
+            // Resetta l'ora corrente a mezzanotte (00:00:00) per includere tutti gli eventi di oggi
+            now.setHours(0, 0, 0, 0); 
+            
+            // Filtra e ordina gli eventi a partire da oggi
             const upcomingDocs = docs.filter(doc => new Date(doc.data().eventDate) >= now);
+
 
             if (upcomingDocs.length === 0) {
                 eventsCarousel.innerHTML = `
