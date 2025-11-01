@@ -897,6 +897,7 @@
             // Aggiorna i colori dello status per abbinarli al tema
             partnerStatus.classList.remove('text-green-700', 'bg-green-100'); // Rimuove vecchie classi (se presenti)
             partnerStatus.classList.add('text-pink-700', 'bg-pink-100'); // Aggiunge nuove classi rosa
+            listenForEvents();
         }
 
         // (Tutta la logica della chat è stata rimossa)
@@ -929,7 +930,7 @@
                 console.error("Errore formattazione data:", e);
                 return "Data non valida";
             }
-            listenForEvents();
+            
         }
         
         /**
