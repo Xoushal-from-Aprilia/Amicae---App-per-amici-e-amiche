@@ -300,20 +300,9 @@
         <div id="home-view" class="app-view slide-from-bottom flex flex-col bg-custom-pink">
             <header class="bg-white border-b border-gray-200 p-4 flex items-center justify-between shadow-sm flex-shrink-0 z-10">
                 <h1 class="text-2xl font-extrabold fontTitle txt-custom-pink">Lume</h1>
-                
-                <!-- **** HTML MODIFICATO **** -->
                 <div class="flex items-center space-x-2">
                     <span id="partner-status" class="text-xs font-medium px-3 py-1 rounded-full text-pink-700 bg-pink-100 bordrs">...</span>
-                    
-                    <!-- NUOVO PULSANTE DISCONNETTI -->
-                    <button id="disconnect-btn" class="text-gray-400 hover:text-red-600 p-1" title="Disconnetti partner">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                             <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                    </button>
                 </div>
-                <!-- **** FINE HTML MODIFICATO **** -->
-
             </header>
             
             <div class="flex-grow p-6 rounded-t-3xl shadow-2xl overflow-y-auto ">
@@ -330,7 +319,7 @@
                         </button>
                     </div>
                     
-<!-- NUOVO: Carosello Eventi -->
+                    <!-- NUOVO: Carosello Eventi -->
                     <div id="events-carousel" class="flex overflow-x-auto space-x-4 pb-4 no-scrollbar" style="scroll-snap-type: x mandatory;">
                         <!-- Gli eventi verranno iniettati qui da JS -->
                         <div class="p-5 text-center text-gray-500 w-full">
@@ -430,6 +419,7 @@
                 </div>
             </div>
         </div>
+
         <div id="message-modal" class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4 z-50 transition-opacity duration-300 opacity-0">
             <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full text-center transform transition-all scale-95 border border-gray-200">
                 <p id="modal-text" class="text-md text-gray-800 mb-6"></p>
@@ -485,10 +475,7 @@
     
     
 
-    </div> 
-    
-    <!-- **** INIZIO SCRIPT MODIFICATO **** -->
-    <script type="module">
+    </div> <script type="module">
         // Importa funzioni Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
@@ -496,12 +483,12 @@
             signInAnonymously, 
             signInWithCustomToken, 
             onAuthStateChanged,
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword,   
-            signInWithPopup,              
-            GoogleAuthProvider,           
-            FacebookAuthProvider,         
-            signOut                       
+            createUserWithEmailAndPassword, // NUOVO
+            signInWithEmailAndPassword,   // NUOVO
+            signInWithPopup,              // NUOVO
+            GoogleAuthProvider,           // NUOVO
+            FacebookAuthProvider,         // NUOVO
+            signOut                       // NUOVO
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
             getFirestore, 
@@ -556,36 +543,42 @@
         let pairingCode = null;
         let partnerId = null;
         let pairingListenerUnsubscribe = null;
-        let eventsListenerUnsubscribe = null; // <-- VARIABILE GLOBALE PER EVENTI
+                
         
         let isAuthReady = false; 
 
+        // let messagesListenerUnsubscribe = null; // RIMOSSO
+        
         // Riferimenti DOM
         const views = {
             loading: document.getElementById('loading-view'),
-            welcome: document.getElementById('welcome-view'), 
-            signup: document.getElementById('signup-view'),   
-            signin: document.getElementById('signin-view'),   
+            welcome: document.getElementById('welcome-view'), // NUOVO
+            signup: document.getElementById('signup-view'),   // NUOVO
+            signin: document.getElementById('signin-view'),   // NUOVO
             auth: document.getElementById('auth-view'),
-            home: document.getElementById('home-view')
+            home: document.getElementById('home-view') // SOSTITUITO main con home
         };
         const modal = document.getElementById('auth-modal');
         const modalSheetContent = document.getElementById('modal-sheet-content');
         const codeDisplay = document.getElementById('code-display');
         const codeInput = document.getElementById('code-input');
-        const partnerStatus = document.getElementById('partner-status');
+        // Riferimenti chat rimossi
+        // const chatMessages = document.getElementById('chat-messages');
+        // const chatInput = document.getElementById('chat-input');
+        // const sendButton = document.getElementById('send-button');
+        const partnerStatus = document.getElementById('partner-status'); // MANTENUTO
+          // Modale Messaggi
         const messageModal = document.getElementById('message-modal');
         const modalText = document.getElementById('modal-text');
         const modalContent = messageModal.querySelector('div'); 
 
-        // Riferimenti Modale Eventi
+// NUOVO: Riferimenti Modale Eventi
         const addEventModal = document.getElementById('add-event-modal');
         const addEventModalContent = document.getElementById('add-event-modal-content');
         const addEventBtn = document.getElementById('add-event-btn');
         const closeEventModalBtn = document.getElementById('close-event-modal-btn');
         const addEventForm = document.getElementById('add-event-form');
         const eventsCarousel = document.getElementById('events-carousel');
-        
         // --- Funzioni di Utility ---
 
         /**
@@ -600,6 +593,7 @@
                     view.classList.remove('slide-from-bottom');
                 } else {
                     view.classList.remove('visible');
+                    // Reimposta la posizione di partenza
                     if (!view.classList.contains('slide-from-bottom')) {
                         view.classList.add('slide-from-bottom');
                     }
@@ -607,11 +601,12 @@
             });
         }
 
-/**
+        /**
          * Mostra un messaggio modale (sostituto di alert)
          * @param {string} message Testo da mostrare
          */
         function showMessage(message) {
+            // Sostituisci i codici di errore di Firebase con messaggi amichevoli
             let friendlyMessage = message;
             if (message.includes("auth/email-already-in-use")) {
                 friendlyMessage = "Questo indirizzo email è già in uso. Prova ad accedere.";
@@ -633,6 +628,7 @@
             }, 10);
         }
 
+        // Evento chiusura modale messaggi
         document.getElementById('modal-close-button').addEventListener('click', () => {
             messageModal.classList.add('opacity-0');
             modalContent.classList.add('scale-95');
@@ -640,6 +636,7 @@
         });
 
         // --- Logica Modale Auth (Sheet) ---
+        // (Questa è la logica per il MODALE di pairing, non per il login)
         
         function openAuthModal(tab) {
             if (!isAuthReady || !userId) {
@@ -701,93 +698,25 @@
         tabButtons.create.addEventListener('click', () => switchTab('create'));
         tabButtons.join.addEventListener('click', () => switchTab('join'));
 
-        
-        // --- **** NUOVA LOGICA DI PERSISTENZA **** ---
+        // --- NUOVA Logica di Autenticazione ---
 
-        /**
-         * Salva o pulisce i dati di pairing sul profilo dell'utente
-         * nella nuova collezione 'users'.
-         * @param {string} uid L'ID dell'utente da aggiornare
-         * @param {string} pId L'ID del partner (o null per pulire)
-         * @param {string} pCode Il codice di pairing (o null per pulire)
-         */
-        async function updateUserPairing(uid, pId, pCode) {
-            if (!uid) return;
-            const userDocRef = doc(db, 'users', uid); // Nuova collezione 'users'
-            try {
-                // Usa setDoc con merge:true per creare/aggiornare il documento
-                await setDoc(userDocRef, { 
-                    currentPairingCode: pCode,
-                    currentPartnerId: pId
-                }, { merge: true }); // 'merge: true' è importante
-                console.log(`Dati pairing aggiornati per utente ${uid}`);
-            } catch (error) {
-                console.error(`Errore aggiornamento pairing per ${uid}:`, error);
-            }
-        }
-
-
-        // --- Logica di Autenticazione (MODIFICATA) ---
-
-        /**
-         * SOSTITUITA: onAuthStateChanged
-         * Ora controlla se l'utente ha un pairing salvato
-         * prima di decidere quale vista mostrare.
-         */
-        onAuthStateChanged(auth, async (user) => { // Aggiunto 'async'
+        onAuthStateChanged(auth, (user) => {
             if (user) {
                 console.log("Utente autenticato:", user.uid);
                 userId = user.uid;
                 isAuthReady = true;
-                
-                // --- NUOVA LOGICA: Controlla se l'utente ha già un pairing ---
-                try {
-                    const userDocRef = doc(db, 'users', userId);
-                    const userDocSnap = await getDoc(userDocRef);
-
-                    if (userDocSnap.exists() && userDocSnap.data().currentPairingCode) {
-                        // L'utente ha un pairing salvato
-                        const userData = userDocSnap.data();
-                        pairingCode = userData.currentPairingCode;
-                        partnerId = userData.currentPartnerId; 
-
-                        console.log(`Pairing ${pairingCode} trovato. Avvio Home.`);
-                        
-                        // Verifica se il pairing esiste ancora in 'artifacts'
-                        const pairDocRef = doc(db, 'artifacts', appId, 'public/data/pairings', pairingCode);
-                        const pairDocSnap = await getDoc(pairDocRef);
-
-                        if (pairDocSnap.exists()) {
-                            startHomeView(); // VAI DIRETTO ALLA HOME
-                        } else {
-                            // Il pairing non esiste più, pulisci i dati vecchi
-                            console.warn("Pairing salvato non trovato in DB. Resetto.");
-                            await updateUserPairing(userId, null, null); // Pulisci i dati
-                            partnerId = null;
-                            pairingCode = null;
-                            showView('auth'); // Vai alla schermata di pairing
-                        }
-                    } else {
-                        // L'utente non ha pairing salvati, mostra la schermata di pairing
-                        console.log("Nessun pairing salvato. Mostro Auth view.");
-                        showView('auth');
-                    }
-                } catch (error) {
-                    console.error("Errore nel recupero pairing utente:", error);
-                    showView('auth'); // Fallback in caso di errore
-                }
-                // --- FINE NUOVA LOGICA ---
-
+                // Piccolo ritardo per mostrare l'animazione di caricamento
+                // L'utente è loggato, mostra la vista di pairing
+                setTimeout(() => showView('auth'), 500); 
             } else {
                 console.log("Nessun utente, mostro la welcome view.");
                 userId = null;
-                partnerId = null; // Assicurati di resettare
-                pairingCode = null; // Assicurati di resettare
-                isAuthReady = true;
+                isAuthReady = true; // L'app è pronta per il login
+                // Piccolo ritardo per mostrare l'animazione di caricamento
+                // Nessun utente, mostra la vista di benvenuto
                 setTimeout(() => showView('welcome'), 500); 
             }
         });
-
 
         // Tenta il login con token custom se esiste (per ambiente Canvas)
         (async () => {
@@ -799,11 +728,13 @@
                 }
             } catch (error) {
                 console.error("Errore con token iniziale:", error);
+                // onAuthStateChanged gestirà e mostrerà 'welcome-view'
             }
         })();
 
-        // --- Listener per le viste di Login/Registrazione ---
+        // --- NUOVI Listener per le viste di Login/Registrazione ---
 
+        // Navigazione tra le viste
         document.getElementById('get-started-btn').addEventListener('click', () => showView('signup'));
         document.getElementById('go-to-signin-link').addEventListener('click', () => showView('signin'));
         document.getElementById('go-to-signin-link-2').addEventListener('click', () => showView('signin'));
@@ -816,6 +747,7 @@
             const password = document.getElementById('signup-password').value;
             try {
                 await createUserWithEmailAndPassword(auth, email, password);
+                // onAuthStateChanged gestirà la transizione
             } catch (error) {
                 showMessage(error.message);
             }
@@ -827,6 +759,7 @@
             const password = document.getElementById('signin-password').value;
             try {
                 await signInWithEmailAndPassword(auth, email, password);
+                // onAuthStateChanged gestirà la transizione
             } catch (error) {
                 showMessage(error.message);
             }
@@ -839,6 +772,7 @@
                 : new FacebookAuthProvider();
             try {
                 await signInWithPopup(auth, provider);
+                // onAuthStateChanged gestirà la transizione
             } catch (error) {
                 showMessage(error.message);
             }
@@ -849,28 +783,19 @@
         document.getElementById('signin-google-btn').addEventListener('click', () => handleSocialLogin('google'));
         document.getElementById('signin-facebook-btn').addEventListener('click', () => handleSocialLogin('facebook'));
 
-        /**
-         * MODIFICATO: signout-btn
-         * Ora resetta correttamente tutti gli listener e lo stato locale.
-         */
+        // Gestione Sign Out
         document.getElementById('signout-btn').addEventListener('click', async () => {
             try {
                 await signOut(auth);
-                // Resetta lo stato
-                if (pairingListenerUnsubscribe) pairingListenerUnsubscribe();
-                if (eventsListenerUnsubscribe) eventsListenerUnsubscribe();
-                pairingListenerUnsubscribe = null;
-                eventsListenerUnsubscribe = null;
-                userId = null;
-                partnerId = null;
-                pairingCode = null;
                 // onAuthStateChanged gestirà la transizione a 'welcome-view'
             } catch (error) {
                 showMessage(error.message);
             }
         });
 
-// --- Logica di Connessione (Pairing) (MODIFICATA) ---
+
+        // --- Logica di Connessione (Pairing) ---
+        // (Questa logica è quasi invariata, ma ora dipende da un userId non anonimo)
 
         async function handleCreateConnection() {
             if (!userId) return;
@@ -889,7 +814,7 @@
                     createdAt: serverTimestamp()
                 });
                 codeDisplay.textContent = pairingCode;
-                listenForPairing(pairDocRef); // Avvia l'ascolto
+                listenForPairing(pairDocRef);
             } catch (error) {
                 console.error("Errore creazione connessione:", error);
                 showMessage("Impossibile creare la connessione. Riprova.");
@@ -897,11 +822,7 @@
             }
         }
 
-        /**
-         * SOSTITUITO: join-button listener
-         * Ora salva la connessione su entrambi i profili utente.
-         */
-        document.getElementById('join-button').addEventListener('click', async () => { // Aggiunto 'async'
+        document.getElementById('join-button').addEventListener('click', async () => {
             if (!userId) return;
 
             const code = codeInput.value.trim();
@@ -927,15 +848,9 @@
                 });
 
                 partnerId = docSnap.data().initiatorId;
-
-                // --- NUOVA LOGICA: Salva il pairing per entrambi ---
-                await updateUserPairing(userId, partnerId, pairingCode); // Per l'utente corrente
-                await updateUserPairing(partnerId, userId, pairingCode); // Per il partner
-                // --- FINE NUOVA LOGICA ---
-
                 closeAuthModal();
-                showMessage("Connesso! Benvenuti.");
-                startHomeView(); 
+                showMessage("Connesso! Benvenuti."); // Messaggio aggiornato
+                startHomeView(); // NOME FUNZIONE AGGIORNATO
 
             } catch (error) {
                 console.error("Errore unione connessione:", error);
@@ -943,24 +858,28 @@
             }
         });
         
-        /**
-         * SOSTITUITO: listenForPairing
-         * Ora salva la connessione su entrambi i profili utente.
-         */
+                document.getElementById('signout-btn').addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                // ... (codice esistente per resettare state)
+                if (pairingListenerUnsubscribe) pairingListenerUnsubscribe();
+                if (eventsListenerUnsubscribe) eventsListenerUnsubscribe(); // <-- AGGIUNGI QUESTA RIGA
+                pairingListenerUnsubscribe = null;
+                eventsListenerUnsubscribe = null; // <-- AGGIUNGI QUESTA RIGA
+            } catch (error) {
+                showMessage(error.message);
+            }
+        });
+
+
         function listenForPairing(docRef) {
-            pairingListenerUnsubscribe = onSnapshot(docRef, async (docSnap) => { // Aggiunto 'async'
+            pairingListenerUnsubscribe = onSnapshot(docRef, (docSnap) => {
                 if (docSnap.exists() && docSnap.data().status === 'connected') {
                     partnerId = docSnap.data().joinerId;
-                    
-                    // --- NUOVA LOGICA: Salva il pairing per entrambi ---
-                    await updateUserPairing(userId, partnerId, pairingCode); // Per l'utente corrente
-                    await updateUserPairing(partnerId, userId, pairingCode); // Per il partner
-                    // --- FINE NUOVA LOGICA ---
-
                     if (pairingListenerUnsubscribe) pairingListenerUnsubscribe();
                     closeAuthModal();
-                    showMessage("Partner connesso! Benvenuti.");
-                    startHomeView();
+                    showMessage("Partner connesso! Benvenuti."); // Messaggio aggiornato
+                    startHomeView(); // NOME FUNZIONE AGGIORNATO
                 }
             }, (error) => {
                 console.error("Errore ascolto pairing:", error);
@@ -971,24 +890,25 @@
         
         // --- Logica App Principale (Home) ---
 
-        /**
-         * MODIFICATO: startHomeView
-         * Ora chiama listenForEvents()
-         */
         function startHomeView() {
             showView('home');
+            // Aggiorna lo status nell'header della nuova home view
             partnerStatus.textContent = `Connesso con: ${partnerId.substring(0, 6)}...`; 
-            partnerStatus.classList.add('text-pink-700', 'bg-pink-100');
-            
-            // --- CORREZIONE: Avvia l'ascolto eventi QUI ---
+            // Aggiorna i colori dello status per abbinarli al tema
+            partnerStatus.classList.remove('text-green-700', 'bg-green-100'); // Rimuove vecchie classi (se presenti)
+            partnerStatus.classList.add('text-pink-700', 'bg-pink-100'); // Aggiunge nuove classi rosa
             listenForEvents();
         }
+
+        // (Tutta la logica della chat è stata rimossa)
         
-        // --- Logica Eventi (MODIFICATA) ---
+        
+                // --- NUOVA: Logica Eventi ---
 
         /**
-         * MODIFICATO: formatEventDate
-         * Rimuove la chiamata a listenForEvents()
+         * Formatta una stringa data ISO (es. 2025-12-20T20:30) in un formato leggibile.
+         * @param {string} isoString
+         * @returns {string} Data formattata (es. "ven 20 dic, 20:30")
          */
         function formatEventDate(isoString) {
             if (!isoString) return "Data non specificata";
@@ -1003,35 +923,28 @@
                     hour12: false
                 };
                 let formatted = new Intl.DateTimeFormat('it-IT', options).format(date);
+                // Pulisce la formattazione (es. rimuove "alle")
                 formatted = formatted.replace('alle', '');
                 return formatted;
             } catch (e) {
                 console.error("Errore formattazione data:", e);
                 return "Data non valida";
             }
-            // RIMOSSA "listenForEvents()" da qui
+            
         }
         
         /**
          * Si mette in ascolto degli eventi condivisi sulla connessione.
          */
         function listenForEvents() {
-            if (!pairingCode) {
-                console.warn("listenForEvents chiamato senza pairingCode.");
-                return;
-            }
-            if (eventsListenerUnsubscribe) {
-                console.log("Listener eventi già attivo. Riavvio.");
-                eventsListenerUnsubscribe(); // Ferma il vecchio listener
-            }
+            if (!pairingCode) return;
+            if (eventsListenerUnsubscribe) eventsListenerUnsubscribe();
 
             const eventsCollectionRef = collection(db, 'artifacts', appId, 'public/data/pairings', pairingCode, 'events');
             // Ordina per data evento, dal più vicino al più lontano
             const q = query(eventsCollectionRef, orderBy("eventDate", "asc"));
-            console.log(`Ascolto eventi su: artifacts/${appId}/public/data/pairings/${pairingCode}/events`);
 
             eventsListenerUnsubscribe = onSnapshot(q, (snapshot) => {
-                console.log(`Ricevuti ${snapshot.docs.length} eventi.`);
                 renderEvents(snapshot.docs);
             }, (error) => {
                 console.error("Errore ascolto eventi:", error);
@@ -1044,7 +957,7 @@
          * @param {Array} docs Array di documenti (eventi) da Firestore.
          */
         function renderEvents(docs) {
-            eventsCarousel.innerHTML = ''; 
+            eventsCarousel.innerHTML = ''; // Pulisce il carosello
 
             if (docs.length === 0) {
                 eventsCarousel.innerHTML = `
@@ -1056,10 +969,15 @@
                 return;
             }
 
+            // Filtra eventi passati (opzionale, ma utile)
+                        // Filtra eventi passati (considerando solo la data odierna)
             const now = new Date();
+            // Resetta l'ora corrente a mezzanotte (00:00:00) per includere tutti gli eventi di oggi
             now.setHours(0, 0, 0, 0); 
             
+            // Filtra e ordina gli eventi a partire da oggi
             const upcomingDocs = docs.filter(doc => new Date(doc.data().eventDate) >= now);
+
 
             if (upcomingDocs.length === 0) {
                 eventsCarousel.innerHTML = `
@@ -1075,10 +993,13 @@
                 const event = doc.data();
                 const eventDate = new Date(event.eventDate);
 
+                // Formattazione per il "datario"
                 const day = eventDate.getDate();
                 const month = eventDate.toLocaleString('it-IT', { month: 'short' }).toUpperCase().replace('.', '');
 
+                // Formattazione per la data leggibile
                 const fullFormattedDate = formatEventDate(event.eventDate);
+
 
                 const eventCardHTML = `
                     <div class="flex-shrink-0 w-4/5 max-w-xs bg-white p-5 rounded-2xl shadow-lg border border-gray-100" style="scroll-snap-align: start;">
@@ -1102,7 +1023,7 @@
         // --- Listener Modale Eventi ---
         
         function openEventModal() {
-            addEventForm.reset(); 
+            addEventForm.reset(); // Pulisce il form
             addEventModal.classList.remove('hidden');
             setTimeout(() => {
                 addEventModal.classList.remove('opacity-0');
@@ -1119,9 +1040,11 @@
         addEventBtn.addEventListener('click', openEventModal);
         closeEventModalBtn.addEventListener('click', closeEventModal);
         
+        // Clicca fuori per chiudere (solo per modale eventi)
         addEventModal.addEventListener('click', (e) => {
             if (e.target.id === 'add-event-modal') closeEventModal();
         });
+
 
         // Gestione salvataggio evento
         addEventForm.addEventListener('submit', async (e) => {
@@ -1136,8 +1059,10 @@
             const time = document.getElementById('event-time').value;
             const description = document.getElementById('event-description').value;
             
+            // Combina data e ora in una stringa ISO 8601 valida (es: 2025-12-20T14:30)
             const eventDateISO = `${date}T${time}`;
 
+            // Validazione base
             if (!title || !date || !time) {
                 showMessage("Titolo, data e ora sono obbligatori.");
                 return;
@@ -1148,6 +1073,7 @@
             }
 
             try {
+                // Salva l'evento nella sottocollezione del pairing
                 const eventsCollectionRef = collection(db, 'artifacts', appId, 'public/data/pairings', pairingCode, 'events');
                 
                 await addDoc(eventsCollectionRef, {
@@ -1166,43 +1092,8 @@
                 showMessage("Impossibile salvare l'evento. Riprova.");
             }
         });
-        
-           /**
-         * NUOVO: Listener per il pulsante Disconnetti
-         * Pulisce i dati di pairing per entrambi gli utenti e torna alla auth-view.
-         */
-        document.getElementById('disconnect-btn').addEventListener('click', async () => {
-            // Avviso: Azione immediata senza 'confirm()' per rispettare le linee guida.
-            console.log("Disconnessione...");
 
-            // Pulisci i dati di pairing per entrambi gli utenti
-            if (userId) {
-                await updateUserPairing(userId, null, null); 
-            }
-            if (partnerId) {
-                await updateUserPairing(partnerId, null, null); 
-            }
-            
-            // (Opzionale) Aggiorna lo stato del vecchio pairing
-            if (pairingCode) {
-                try {
-                    const pairDocRef = doc(db, 'artifacts', appId, 'public/data/pairings', pairingCode);
-                    await updateDoc(pairDocRef, { status: 'disconnected', disconnectedAt: serverTimestamp() });
-                } catch (e) { console.warn("Impossibile aggiornare vecchio pairing:", e.message); }
-            }
-
-            // Resetta lo stato locale e mostra la auth-view
-            partnerId = null;
-            pairingCode = null;
-            if (eventsListenerUnsubscribe) { // Ferma l'ascolto eventi
-                eventsListenerUnsubscribe();
-                eventsListenerUnsubscribe = null;
-            }
-            eventsCarousel.innerHTML = ''; // Pulisci gli eventi
-            showView('auth');
-        });
 
     </script>
-    <!-- **** FINE SCRIPT MODIFICATO **** -->
 </body>
 </html>
