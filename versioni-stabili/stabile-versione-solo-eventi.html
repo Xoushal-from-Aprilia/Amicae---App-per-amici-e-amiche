@@ -134,33 +134,6 @@
             border-radius: 2px;
             margin: 0 auto 1rem auto;
         }
-
-        /* --- NUOVI STILI DIARIO --- */
-        /* Stile per i tab del diario */
-        .diary-tab {
-            transition: all 0.2s ease-in-out;
-        }
-        .diary-tab.active {
-            border-color: #F7BBE1; /* border-pink */
-            color: #F7BBE1; /* text-custom-pink */
-            background-color: #fdf2f8; /* bg-pink-50 (un po' più scuro) */
-        }
-        .diary-tab:not(.active) {
-            border-color: transparent;
-            color: #6b7280; /* text-gray-500 */
-        }
-
-        /* Stile per i pulsanti disabilitati */
-        :disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        /* Stile per text area del diario */
-        #diary-page-body {
-            min-height: 250px;
-            resize: none;
-        }
     </style>
 </head>
 <body class="h-screen overflow-hidden bg-gray-50 antialiased">
@@ -182,7 +155,7 @@
         <div id="welcome-view" class="app-view slide-from-bottom flex flex-col justify-between p-8 bg-white">
             <div class="flex-grow flex flex-col items-center justify-center text-center">
                 <div class="relative mb-12 mt-16">
-                    <img src="/images/1761762271275.png" alt="Mascot Placeholder" class="w-48 h-auto mx-auto rounded-lg" onerror="this.src='https://placehold.co/192x192/F3E8FF/333333?text=Lume'">
+                    <img src="/images/1761762271275.png" alt="Mascot Placeholder" class="w-48 h-auto mx-auto rounded-lg">
                     
                     <div class="absolute -top-10 -left-8 transform -rotate-12">
                         <div class="relative bg-whitr text-white text-lg rounded-full py-3 px-6 ">
@@ -351,7 +324,7 @@
             <div class="flex-grow p-8 rounded-t-3xl shadow-2xl overflow-y-auto bg-gray-50 pt-8">
                 
 
-  <!-- SEZIONE EVENTI DINAMICA -->
+                <!-- SEZIONE EVENTI DINAMICA -->
                 <div class="mb-8">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-2xl font-bold text-gray-800">Eventi in Arrivo</h2>
@@ -375,8 +348,7 @@
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800 mb-4">Le Nostre Attività</h2>
                     <div class="grid grid-cols-2 gap-4">
-                        <!-- **** MODIFICATO: Aggiunto ID al pulsante Diario **** -->
-                        <div id="go-to-diary-btn" class="bg-pink p-6 rounded-2xl shadow-lg aspect-square flex flex-col items-center justify-center text-center cursor-pointer hover:shadow-xl transition-shadow">
+                        <div class="bg-pink p-6 rounded-2xl shadow-lg aspect-square flex flex-col items-center justify-center text-center cursor-pointer hover:shadow-xl transition-shadow">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-custom-pink mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                             </svg>
@@ -424,7 +396,7 @@
              </footer>
         </div>
         
-        <!-- **** INIZIO VISTA PROFILO **** -->
+        <!-- **** INIZIO NUOVA VISTA PROFILO **** -->
         <div id="profile-view" class="app-view slide-from-bottom flex flex-col bg-gray-50">
             <!-- Header Profilo -->
             <header class="bg-white border-b border-gray-200 p-4 flex items-center justify-center shadow-sm flex-shrink-0 z-10 relative">
@@ -512,102 +484,7 @@
                 </button>
              </footer>
         </div>
-        <!-- **** FINE VISTA PROFILO **** -->
- <!-- **** INIZIO NUOVA VISTA DIARIO **** -->
-        <div id="diary-view" class="app-view slide-from-bottom flex flex-col bg-gray-50">
-            <!-- Header Diario -->
-            <header class="bg-white border-b border-gray-200 p-4 flex items-center justify-between shadow-sm flex-shrink-0 z-10 relative">
-                <button id="diary-back-btn" class="text-gray-600 hover:text-custom-pink p-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </button>
-                <h1 class="text-xl font-bold text-gray-900">Diario</h1>
-                <div class="w-8"></div> <!-- Spacer -->
-            </header>
-
-            <!-- Contenuto Diario -->
-            <div class="flex-grow overflow-y-auto p-4 space-y-4">
-                
-                <!-- Tab di Navigazione -->
-                <div class="grid grid-cols-2 gap-2 bg-gray-100 p-1 rounded-xl">
-                    <button id="diary-tab-my" class="diary-tab active text-sm font-medium py-2 px-3 rounded-lg border-2">
-                        Il Mio Diario
-                    </button>
-                    <button id="diary-tab-partner" class="diary-tab text-sm font-medium py-2 px-3 rounded-lg border-2">
-                        Diario Partner
-                    </button>
-                </div>
-
-                <!-- Contenitore Pagina -->
-                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-4">
-                    
-                    <!-- Info Pagina e Navigazione -->
-                    <div class="flex justify-between items-center mb-3">
-                        <button id="diary-prev-btn" class="text-gray-500 hover:text-custom-pink p-2 rounded-full disabled:opacity-50">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                            </svg>
-                        </button>
-                        <span id="diary-page-indicator" class="text-sm font-semibold text-gray-700">Pagina 0 / 0</span>
-                        <button id="diary-next-btn" class="text-gray-500 hover:text-custom-pink p-2 rounded-full disabled:opacity-50">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- Input Titolo -->
-                    <div>
-                        <label for="diary-page-title" class="block text-xs font-medium text-gray-500 mb-1">Titolo</label>
-                        <input id="diary-page-title" type="text" placeholder="Titolo della pagina..." class="w-full px-3 py-2 text-lg font-bold rounded-xl border border-gray-200 bg-gray-50 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-pink read-only:bg-gray-100 read-only:text-gray-600">
-                    </div>
-
-                    <!-- Input Corpo -->
-                    <div class="mt-3">
-                        <label for="diary-page-body" class="block text-xs font-medium text-gray-500 mb-1">Contenuto</j>
-                        <textarea id="diary-page-body" rows="10" placeholder="Cosa è successo oggi?" class="w-full px-3 py-2 text-md rounded-xl border border-gray-200 bg-gray-50 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-pink read-only:bg-gray-100 read-only:text-gray-600"></textarea>
-                    </div>
-
-                    <!-- Metadata -->
-                    <div class="text-xs text-gray-400 mt-3 space-y-1">
-                        <p>Creato: <span id="diary-created-at">N/D</span></p>
-                        <p>Modificato: <span id="diary-updated-at">N/D</span></p>
-                    </div>
-
-                    <!-- Messaggio "Nessuna Pagina" -->
-                    <div id="diary-no-pages" class="hidden text-center py-10">
-                        <p class="text-gray-500">Nessuna pagina trovata.</p>
-                        <p id="diary-no-pages-prompt" class="text-gray-400 text-sm mt-1">Crea una nuova pagina per iniziare!</p>
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- Footer Azioni Diario -->
-             <footer class="flex-shrink-0 bg-white border-t border-gray-200 shadow-inner flex justify-around p-3">
-                <button id="diary-delete-btn" class="flex flex-col items-center text-red-500 p-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    <span class="text-xs font-medium">Elimina</span>
-                </button>
-                 <button id="diary-new-btn" class="flex flex-col items-center text-custom-pink p-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
-                    </svg>
-                    <span class="text-xs font-medium">Nuova</span>
-                </button>
-                <button id="diary-save-btn" class="flex flex-col items-center text-blue-500 p-2">
-                   <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3l-4-4-4 4z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 9H9a1 1 0 00-1 1v4a1 1 0 001 1h6a1 1 0 001-1v-4a1 1 0 00-1-1z" />
-                    </svg>
-                    <span class="text-xs font-medium">Salva</span>
-                </button>
-             </footer>
-        </div>
-        <!-- **** FINE NUOVA VISTA DIARIO **** -->
+        <!-- **** FINE NUOVA VISTA PROFILO **** -->
 
 
         <!-- Modale Auth (Sheet) -->
@@ -663,7 +540,8 @@
         </div>
         
 
- <!-- Modale Aggiungi Evento -->
+
+        <!-- Modale Aggiungi Evento -->
         <div id="add-event-modal" class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4 z-50 transition-opacity duration-300 opacity-0">
             <div id="add-event-modal-content" class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full transform transition-all scale-95 border border-gray-200">
                 <div class="flex justify-between items-center mb-4">
@@ -723,7 +601,7 @@
             GoogleAuthProvider,           
             FacebookAuthProvider,         
             signOut,
-            sendPasswordResetEmail
+            sendPasswordResetEmail // <-- NUOVA IMPORTAZIONE
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
             getFirestore, 
@@ -738,8 +616,7 @@
             serverTimestamp, 
             setLogLevel,
             limit,
-            orderBy,
-            deleteDoc // <-- NUOVA IMPORTAZIONE per il diario
+            orderBy
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Variabili Globali (dall'ambiente Canvas) ---
@@ -776,25 +653,13 @@
 
         // Stato dell'applicazione
         let userId = null;
-        let userNickname = null;
+        let userNickname = null; // <-- NUOVA VARIABILE GLOBALE
         let pairingCode = null;
         let partnerId = null;
-        let partnerNickname = "Partner"; // <-- NUOVO: per UI Diario
         let pairingListenerUnsubscribe = null;
         let eventsListenerUnsubscribe = null; 
         
         let isAuthReady = false; 
-
-        // --- NUOVE VARIABILI DI STATO DIARIO ---
-        let myDiaryPages = [];
-        let partnerDiaryPages = [];
-        let currentDiaryView = 'my'; // 'my' o 'partner'
-        let myCurrentPageIndex = -1;
-        let partnerCurrentPageIndex = -1;
-        let myDiaryListenerUnsubscribe = null;
-        let partnerDiaryListenerUnsubscribe = null;
-        let isSavingDiary = false; // Flag per evitare doppi salvataggi
-
 
         // Riferimenti DOM
         const views = {
@@ -804,8 +669,7 @@
             signin: document.getElementById('signin-view'),   
             auth: document.getElementById('auth-view'),
             home: document.getElementById('home-view'),
-            profile: document.getElementById('profile-view'),
-            diary: document.getElementById('diary-view') // <-- NUOVA VISTA
+            profile: document.getElementById('profile-view') // <-- NUOVA VISTA
         };
         const modal = document.getElementById('auth-modal');
         const modalSheetContent = document.getElementById('modal-sheet-content');
@@ -823,23 +687,6 @@
         const closeEventModalBtn = document.getElementById('close-event-modal-btn');
         const addEventForm = document.getElementById('add-event-form');
         const eventsCarousel = document.getElementById('events-carousel');
-
-        // --- NUOVI RIFERIMENTI DOM DIARIO ---
-        const diaryView = document.getElementById('diary-view');
-        const diaryTabMy = document.getElementById('diary-tab-my');
-        const diaryTabPartner = document.getElementById('diary-tab-partner');
-        const diaryPrevBtn = document.getElementById('diary-prev-btn');
-        const diaryNextBtn = document.getElementById('diary-next-btn');
-        const diaryPageIndicator = document.getElementById('diary-page-indicator');
-        const diaryPageTitle = document.getElementById('diary-page-title');
-        const diaryPageBody = document.getElementById('diary-page-body');
-        const diaryCreatedAt = document.getElementById('diary-created-at');
-        const diaryUpdatedAt = document.getElementById('diary-updated-at');
-        const diaryNoPages = document.getElementById('diary-no-pages');
-        const diaryNoPagesPrompt = document.getElementById('diary-no-pages-prompt');
-        const diaryDeleteBtn = document.getElementById('diary-delete-btn');
-        const diaryNewBtn = document.getElementById('diary-new-btn');
-        const diarySaveBtn = document.getElementById('diary-save-btn');
         
         // --- Funzioni di Utility ---
 
@@ -861,21 +708,14 @@
                 }
             });
             
+            // NUOVO: Popola la vista profilo quando viene mostrata
             if (viewId === 'profile') {
                 populateProfileView();
-            }
-
-            // NUOVO: Avvia il diario quando si mostra la vista
-            if (viewId === 'diary') {
-                startDiaryView();
-            } else {
-                // Interrompi i listener del diario se usciamo dalla vista per salvare risorse
-                stopDiaryListeners();
             }
         }
         
         /**
-         * Popola i dati nella vista profilo
+         * NUOVO: Popola i dati nella vista profilo
          */
         function populateProfileView() {
             if (!auth.currentUser) return;
@@ -885,6 +725,7 @@
             if (userNickname) {
                  document.getElementById('profile-nickname').textContent = '@' + userNickname;
             } else {
+                // Fallback: fetch se non è stato caricato
                 console.log("Nickname non in cache, eseguo fetch...");
                 getDoc(doc(db, 'users', userId)).then(docSnap => {
                     if (docSnap.exists()) {
@@ -929,25 +770,6 @@
             modalContent.classList.add('scale-95');
             setTimeout(() => messageModal.classList.add('hidden'), 300);
         });
-          /**
-         * NUOVO: Formattatore data per il diario
-         */
-        function formatDiaryTimestamp(timestamp) {
-            if (!timestamp) return "N/D";
-            try {
-                const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-                return date.toLocaleString('it-IT', { 
-                    day: '2-digit', 
-                    month: '2-digit', 
-                    year: 'numeric', 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                });
-            } catch (e) {
-                console.warn("Timestamp non valido:", timestamp, e);
-                return "Data non valida";
-            }
-        }
 
         // --- Logica Modale Auth (Sheet) ---
         
@@ -1018,6 +840,7 @@
             if (!uid) return;
             const userDocRef = doc(db, 'users', uid); 
             try {
+                // Usa setDoc con merge:true per creare/aggiornare il documento
                 await setDoc(userDocRef, { 
                     currentPairingCode: pCode,
                     currentPartnerId: pId
@@ -1031,6 +854,10 @@
 
         // --- Logica di Autenticazione (MODIFICATA) ---
 
+        /**
+         * MODIFICATO: onAuthStateChanged
+         * Ora carica anche il nickname e controlla il pairing salvato.
+         */
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 console.log("Utente autenticato:", user.uid);
@@ -1038,24 +865,27 @@
                 isAuthReady = true;
                 
                 try {
+                    // Carica i dati dell'utente (nickname, pairing)
                     const userDocRef = doc(db, 'users', userId);
                     const userDocSnap = await getDoc(userDocRef);
 
                     if (userDocSnap.exists()) {
                         const userData = userDocSnap.data();
-                        userNickname = userData.nickname;
+                        userNickname = userData.nickname; // Salva il nickname
                         
+                        // Controlla se l'utente ha già un pairing
                         if (userData.currentPairingCode) {
                             pairingCode = userData.currentPairingCode;
                             partnerId = userData.currentPartnerId; 
 
                             console.log(`Pairing ${pairingCode} trovato. Avvio Home.`);
                             
+                            // Verifica se il pairing esiste ancora
                             const pairDocRef = doc(db, 'artifacts', appId, 'public/data/pairings', pairingCode);
                             const pairDocSnap = await getDoc(pairDocRef);
 
                             if (pairDocSnap.exists() && pairDocSnap.data().status === 'connected') {
-                                startHomeView();
+                                startHomeView(); // VAI DIRETTO ALLA HOME
                             } else {
                                 console.warn("Pairing salvato non valido. Resetto.");
                                 await updateUserPairing(userId, null, null); 
@@ -1064,11 +894,14 @@
                                 showView('auth'); 
                             }
                         } else {
+                            // Utente loggato ma senza pairing
                             console.log("Nessun pairing salvato. Mostro Auth view.");
                             showView('auth');
                         }
                     } else {
+                        // Documento utente non trovato (es. creato solo auth)
                         console.warn("Documento utente non trovato! Mostro Auth view.");
+                        // Potremmo voler creare un doc qui se manca
                         await setDoc(userDocRef, { email: user.email, nickname: "Utente" }, { merge: true });
                         userNickname = "Utente";
                         showView('auth');
@@ -1081,9 +914,8 @@
             } else {
                 console.log("Nessun utente, mostro la welcome view.");
                 userId = null;
-                userNickname = null;
+                userNickname = null; // Resetta nickname
                 partnerId = null; 
-                partnerNickname = "Partner"; // Resetta
                 pairingCode = null; 
                 isAuthReady = true;
                 setTimeout(() => showView('welcome'), 500); 
@@ -1111,11 +943,15 @@
         document.getElementById('go-to-signin-link-2').addEventListener('click', () => showView('signin'));
         document.getElementById('go-to-signup-link').addEventListener('click', () => showView('signup'));
 
+        /**
+         * MODIFICATO: Gestione Form Registrazione
+         * Ora salva anche nickname ed email nel documento 'users'
+         */
         document.getElementById('signup-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
-            const nickname = document.getElementById('signup-name').value;
+            const nickname = document.getElementById('signup-name').value; // <-- Prende il nickname
             
             if (!nickname) {
                 showMessage("Il nickname è obbligatorio.");
@@ -1126,11 +962,13 @@
                 const userCred = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCred.user;
                 
+                // --- NUOVO: Salva i dati utente su Firestore ---
                 await setDoc(doc(db, 'users', user.uid), {
                     nickname: nickname,
                     email: user.email
                 });
-                userNickname = nickname;
+                userNickname = nickname; // Aggiorna la var globale
+                // onAuthStateChanged gestirà la transizione
                 
             } catch (error) {
                 showMessage(error.message);
@@ -1143,11 +981,13 @@
             const password = document.getElementById('signin-password').value;
             try {
                 await signInWithEmailAndPassword(auth, email, password);
+                // onAuthStateChanged gestirà la transizione
             } catch (error) {
                 showMessage(error.message);
             }
         });
 
+        // Gestione Login Social
         const handleSocialLogin = async (providerName) => {
             const provider = providerName === 'google' 
                 ? new GoogleAuthProvider() 
@@ -1156,11 +996,13 @@
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
                 
+                // --- NUOVO: Assicura che l'utente social esista in 'users' ---
                 const userDocRef = doc(db, 'users', user.uid);
                 await setDoc(userDocRef, {
                     nickname: user.displayName || "Utente Social",
                     email: user.email
-                }, { merge: true });
+                }, { merge: true }); // Usa merge per non sovrascrivere dati di pairing
+                // onAuthStateChanged gestirà la transizione
                 
             } catch (error) {
                 showMessage(error.message);
@@ -1172,27 +1014,28 @@
         document.getElementById('signin-google-btn').addEventListener('click', () => handleSocialLogin('google'));
         document.getElementById('signin-facebook-btn').addEventListener('click', () => handleSocialLogin('facebook'));
 
+        /**
+         * NUOVO: Funzione centralizzata di Logout
+         */
         async function handleSignOut() {
             try {
                 await signOut(auth);
                 // Resetta lo stato
                 if (pairingListenerUnsubscribe) pairingListenerUnsubscribe();
                 if (eventsListenerUnsubscribe) eventsListenerUnsubscribe();
-                stopDiaryListeners(); // <-- NUOVO
-                
                 pairingListenerUnsubscribe = null;
                 eventsListenerUnsubscribe = null;
-                
                 userId = null;
                 userNickname = null;
                 partnerId = null;
-                partnerNickname = "Partner";
                 pairingCode = null;
+                // onAuthStateChanged gestirà la transizione a 'welcome-view'
             } catch (error) {
                 showMessage(error.message);
             }
         }
         
+        // Assegna la nuova funzione ai pulsanti di logout
         document.getElementById('signout-btn').addEventListener('click', handleSignOut);
         document.getElementById('profile-logout-btn').addEventListener('click', handleSignOut);
 
@@ -1257,6 +1100,7 @@
 
                 partnerId = initiatorId;
 
+                // Salva il pairing per entrambi
                 await updateUserPairing(userId, partnerId, pairingCode); 
                 await updateUserPairing(partnerId, userId, pairingCode); 
 
@@ -1275,6 +1119,7 @@
                 if (docSnap.exists() && docSnap.data().status === 'connected') {
                     partnerId = docSnap.data().joinerId;
                     
+                    // Salva il pairing per entrambi
                     await updateUserPairing(userId, partnerId, pairingCode); 
                     await updateUserPairing(partnerId, userId, pairingCode); 
 
@@ -1289,26 +1134,25 @@
                 closeAuthModal();
             });
         }
-          // --- Logica App Principale (Home) ---
+        
+        // --- Logica App Principale (Home) ---
 
         function startHomeView() {
             showView('home');
             
+            // Cerca di mostrare il nickname del partner se possibile
             if (partnerId) {
                 getDoc(doc(db, 'users', partnerId)).then(docSnap => {
                     if (docSnap.exists()) {
-                         partnerNickname = docSnap.data().nickname || "Partner"; // Salva nickname partner
-                         partnerStatus.textContent = `Connesso con: @${partnerNickname}`;
-                         diaryTabPartner.textContent = `Diario di @${partnerNickname}`; // Aggiorna tab diario
+                         partnerStatus.textContent = `Connesso con: @${docSnap.data().nickname}`;
                     } else {
                         partnerStatus.textContent = `Connesso con: ${partnerId.substring(0, 6)}...`; 
-                        diaryTabPartner.textContent = `Diario Partner`;
                     }
                     partnerStatus.classList.add('text-pink-700', 'bg-pink-100');
                 });
             }
             
-            listenForEvents();
+            listenForEvents(); // Avvia ascolto eventi
         }
          // --- Logica Eventi ---
 
@@ -1367,6 +1211,7 @@
             }
 
             const now = new Date();
+            // Confronta solo la data, non l'ora, per "oggi"
             const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             
             const upcomingDocs = docs.filter(doc => new Date(doc.data().eventDate) >= today);
@@ -1445,6 +1290,7 @@
             const time = document.getElementById('event-time').value;
             const description = document.getElementById('event-description').value;
             
+            // Validazione data
             if (!title || !date || !time) {
                 showMessage("Titolo, data e ora sono obbligatori.");
                 return;
@@ -1483,6 +1329,7 @@
          * Listener per il pulsante Disconnetti
          */
         document.getElementById('disconnect-btn').addEventListener('click', async () => {
+            // Avviso: Azione immediata. In un'app reale, si userebbe un modale di conferma.
             console.log("Disconnessione partner...");
 
             if (userId) await updateUserPairing(userId, null, null); 
@@ -1496,25 +1343,24 @@
             }
 
             partnerId = null;
-            partnerNickname = "Partner";
             pairingCode = null;
             if (eventsListenerUnsubscribe) { 
                 eventsListenerUnsubscribe();
                 eventsListenerUnsubscribe = null;
             }
-            stopDiaryListeners(); // <-- NUOVO
-
             eventsCarousel.innerHTML = ''; 
             showView('auth');
             showMessage("Partner disconnesso.");
         });
         
         
-        // --- Listener Profilo ---
+        // --- **** NUOVI LISTENER PER PROFILO **** ---
         
+        // Navigazione tra Home e Profilo
         document.getElementById('go-to-profile-btn').addEventListener('click', () => showView('profile'));
         document.getElementById('go-to-home-btn').addEventListener('click', () => showView('home'));
         
+        // Pulsante Reset Password
         document.getElementById('reset-password-btn').addEventListener('click', async () => {
             if (!auth.currentUser || !auth.currentUser.email) {
                  showMessage("Email utente non trovata. Impossibile resettare.");
@@ -1529,10 +1375,12 @@
             }
         });
         
+        // Pulsante Crediti
         document.getElementById('credits-btn').addEventListener('click', () => {
             showMessage('Sviluppato da Christian "Xoushal" Vedovi.\nCon il contributo di Luca "Dragons" Stecchetti.');
         });
         
+        // Pulsanti Impostazioni e Tema (non funzionanti)
         document.getElementById('settings-btn').addEventListener('click', () => {
             showMessage("Funzione Impostazioni non ancora implementata.");
         });
@@ -1540,273 +1388,8 @@
             showMessage("Funzione Tema non ancora implementata.");
         });
 
-        // --- **** NUOVA LOGICA DIARIO **** ---
-
-        // 1. Avvio della vista Diario
-        document.getElementById('go-to-diary-btn').addEventListener('click', () => {
-            showView('diary');
-        });
-
-        document.getElementById('diary-back-btn').addEventListener('click', () => {
-            showView('home');
-        });
-
-        function startDiaryView() {
-            if (!userId || !pairingCode) {
-                showMessage("Errore: devi essere connesso a un partner per usare il diario.");
-                showView('home');
-                return;
-            }
-            
-            // Imposta la tab "Il Mio Diario" come predefinita
-            currentDiaryView = 'my';
-            diaryTabMy.classList.add('active');
-            diaryTabPartner.classList.remove('active');
-            
-            // Avvia i listener per entrambi i diari
-            loadMyDiary();
-            loadPartnerDiary();
-            
-            // Renderizza la pagina (inizialmente il mio diario)
-            renderDiaryPage();
-        }
-
-        function stopDiaryListeners() {
-            if (myDiaryListenerUnsubscribe) {
-                myDiaryListenerUnsubscribe();
-                myDiaryListenerUnsubscribe = null;
-                console.log("Listener mio diario stoppato.");
-            }
-            if (partnerDiaryListenerUnsubscribe) {
-                partnerDiaryListenerUnsubscribe();
-                partnerDiaryListenerUnsubscribe = null;
-                console.log("Listener diario partner stoppato.");
-            }
-            // Resetta stato
-            myDiaryPages = [];
-            partnerDiaryPages = [];
-            myCurrentPageIndex = -1;
-            partnerCurrentPageIndex = -1;
-        }
-
-        // 2. Caricamento Dati
-        function loadMyDiary() {
-            if (myDiaryListenerUnsubscribe) return; // Già in ascolto
-            if (!userId || !pairingCode) return;
-
-            const myDiaryRef = collection(db, 'artifacts', appId, 'public/data/pairings', pairingCode, 'diaries', userId, 'pages');
-            const q = query(myDiaryRef, orderBy("createdAt", "asc"));
-
-            myDiaryListenerUnsubscribe = onSnapshot(q, (snapshot) => {
-                myDiaryPages = snapshot.docs;
-                console.log(`Caricate ${myDiaryPages.length} pagine mie.`);
-
-                // Aggiusta l'indice corrente
-                if (myDiaryPages.length === 0) {
-                    myCurrentPageIndex = -1;
-                } else if (myCurrentPageIndex === -1) {
-                    myCurrentPageIndex = 0; // Vai alla prima pagina se prima era vuoto
-                } else if (myCurrentPageIndex >= myDiaryPages.length) {
-                    // L'indice è fuori range (es. pagina eliminata), vai all'ultima
-                    myCurrentPageIndex = myDiaryPages.length - 1;
-                }
-                
-                // Aggiorna la vista solo se stiamo guardando il mio diario
-                if (currentDiaryView === 'my') {
-                    renderDiaryPage();
-                }
-            }, (error) => {
-                console.error("Errore caricamento mio diario:", error);
-                showMessage("Impossibile caricare il tuo diario.");
-            });
-        }
-
-        function loadPartnerDiary() {
-            if (partnerDiaryListenerUnsubscribe) return; // Già in ascolto
-            if (!partnerId || !pairingCode) return;
-
-            const partnerDiaryRef = collection(db, 'artifacts', appId, 'public/data/pairings', pairingCode, 'diaries', partnerId, 'pages');
-            const q = query(partnerDiaryRef, orderBy("createdAt", "asc"));
-
-            partnerDiaryListenerUnsubscribe = onSnapshot(q, (snapshot) => {
-                partnerDiaryPages = snapshot.docs;
-                console.log(`Caricate ${partnerDiaryPages.length} pagine partner.`);
-
-                // Aggiusta l'indice corrente
-                if (partnerDiaryPages.length === 0) {
-                    partnerCurrentPageIndex = -1;
-                } else if (partnerCurrentPageIndex === -1) {
-                    partnerCurrentPageIndex = 0;
-                } else if (partnerCurrentPageIndex >= partnerDiaryPages.length) {
-                    partnerCurrentPageIndex = partnerDiaryPages.length - 1;
-                }
-                
-                // Aggiorna la vista solo se stiamo guardando il diario partner
-                if (currentDiaryView === 'partner') {
-                    renderDiaryPage();
-                }
-            }, (error) => {
-                console.error("Errore caricamento diario partner:", error);
-                // Non mostrare errore, potrebbero non aver ancora scritto nulla
-            });
-        }
-
-        // 3. Renderizzazione
-        function renderDiaryPage() {
-            const isMyView = (currentDiaryView === 'my');
-            const pages = isMyView ? myDiaryPages : partnerDiaryPages;
-            const index = isMyView ? myCurrentPageIndex : partnerCurrentPageIndex;
-            
-            const hasPages = (index !== -1 && pages.length > 0);
-
-            if (hasPages) {
-                const pageData = pages[index].data();
-                
-                diaryNoPages.classList.add('hidden');
-                diaryPageTitle.value = pageData.title || "";
-                diaryPageBody.value = pageData.body || "";
-                diaryCreatedAt.textContent = formatDiaryTimestamp(pageData.createdAt);
-                diaryUpdatedAt.textContent = formatDiaryTimestamp(pageData.updatedAt);
-                diaryPageIndicator.textContent = `Pagina ${index + 1} / ${pages.length}`;
-            } else {
-                // Nessuna pagina da mostrare
-                diaryNoPages.classList.remove('hidden');
-                diaryPageTitle.value = "";
-                diaryPageBody.value = "";
-                diaryCreatedAt.textContent = "N/D";
-                diaryUpdatedAt.textContent = "N/D";
-                diaryPageIndicator.textContent = "Pagina 0 / 0";
-                
-                if(isMyView) {
-                    diaryNoPagesPrompt.textContent = "Crea una nuova pagina per iniziare!";
-                } else {
-                    diaryNoPagesPrompt.textContent = `@${partnerNickname} non ha ancora scritto nulla.`;
-                }
-            }
-
-            // Imposta stato Read-Only e visibilità pulsanti
-            diaryPageTitle.readOnly = !isMyView;
-            diaryPageBody.readOnly = !isMyView;
-
-            diarySaveBtn.style.display = isMyView ? 'flex' : 'none';
-            diaryNewBtn.style.display = isMyView ? 'flex' : 'none';
-            diaryDeleteBtn.style.display = (isMyView && hasPages) ? 'flex' : 'none'; // Mostra solo se ci sono pagine
-
-            // Abilita/Disabilita pulsanti navigazione
-            diaryPrevBtn.disabled = (index <= 0);
-            diaryNextBtn.disabled = (index >= pages.length - 1 || !hasPages);
-        }
-
-        // 4. Listener Eventi UI Diario
-
-        diaryTabMy.addEventListener('click', () => {
-            currentDiaryView = 'my';
-            diaryTabMy.classList.add('active');
-            diaryTabPartner.classList.remove('active');
-            renderDiaryPage();
-        });
-
-        diaryTabPartner.addEventListener('click', () => {
-            currentDiaryView = 'partner';
-            diaryTabMy.classList.remove('active');
-            diaryTabPartner.classList.add('active');
-            renderDiaryPage();
-        });
-
-        diaryPrevBtn.addEventListener('click', () => {
-            if (currentDiaryView === 'my' && myCurrentPageIndex > 0) {
-                myCurrentPageIndex--;
-            } else if (currentDiaryView === 'partner' && partnerCurrentPageIndex > 0) {
-                partnerCurrentPageIndex--;
-            }
-            renderDiaryPage();
-        });
-diaryNextBtn.addEventListener('click', () => {
-            if (currentDiaryView === 'my' && myCurrentPageIndex < myDiaryPages.length - 1) {
-                myCurrentPageIndex++;
-            } else if (currentDiaryView === 'partner' && partnerCurrentPageIndex < partnerDiaryPages.length - 1) {
-                partnerCurrentPageIndex++;
-            }
-            renderDiaryPage();
-        });
-
-        diaryNewBtn.addEventListener('click', async () => {
-            if (currentDiaryView !== 'my' || !userId || !pairingCode) return;
-
-            try {
-                const myDiaryRef = collection(db, 'artifacts', appId, 'public/data/pairings', pairingCode, 'diaries', userId, 'pages');
-                
-                // Aggiungi la nuova pagina
-                const newPage = {
-                    title: "Nuova Pagina",
-                    body: "",
-                    createdAt: serverTimestamp(),
-                    updatedAt: serverTimestamp()
-                };
-                const docRef = await addDoc(myDiaryRef, newPage);
-                
-                // Il listener onSnapshot aggiornerà myDiaryPages.
-                // Vogliamo impostare l'indice sulla nuova pagina, che sarà l'ultima.
-                myCurrentPageIndex = myDiaryPages.length; // L'array non è ancora aggiornato, quindi .length è il nuovo ultimo indice
-                
-                // renderDiaryPage() sarà chiamato da onSnapshot
-                console.log("Nuova pagina creata, in attesa di snapshot...");
-
-            } catch (error) {
-                console.error("Errore creazione pagina:", error);
-                showMessage("Impossibile creare la pagina.");
-            }
-        });
-
-        diarySaveBtn.addEventListener('click', async () => {
-            if (currentDiaryView !== 'my' || myCurrentPageIndex === -1 || !userId || !pairingCode || isSavingDiary) return;
-            
-            isSavingDiary = true;
-            try {
-                const pageId = myDiaryPages[myCurrentPageIndex].id;
-                const pageRef = doc(db, 'artifacts', appId, 'public/data/pairings', pairingCode, 'diaries', userId, 'pages', pageId);
-
-                const updatedData = {
-                    title: diaryPageTitle.value,
-                    body: diaryPageBody.value,
-                    updatedAt: serverTimestamp()
-                };
-
-                await updateDoc(pageRef, updatedData);
-                showMessage("Pagina salvata!");
-                
-            } catch (error) {
-                console.error("Errore salvataggio pagina:", error);
-                showMessage("Impossibile salvare la pagina.");
-            } finally {
-                isSavingDiary = false;
-            }
-        });
-
-        diaryDeleteBtn.addEventListener('click', async () => {
-            if (currentDiaryView !== 'my' || myCurrentPageIndex === -1 || !userId || !pairingCode) return;
-
-            // NOTA: Come da istruzioni, non uso un 'confirm()' bloccante.
-            // L'utente deve essere sicuro.
-            
-            try {
-                const pageId = myDiaryPages[myCurrentPageIndex].id;
-                const pageRef = doc(db, 'artifacts', appId, 'public/data/pairings', pairingCode, 'diaries', userId, 'pages', pageId);
-
-                await deleteDoc(pageRef);
-                
-                // L'indice verrà aggiustato da onSnapshot
-                showMessage("Pagina eliminata.");
-
-            } catch (error) {
-                console.error("Errore eliminazione pagina:", error);
-                showMessage("Impossibile eliminare la pagina.");
-            }
-        });
-
 
     </script>
     <!-- **** FINE SCRIPT MODIFICATO **** -->
 </body>
 </html>
-
