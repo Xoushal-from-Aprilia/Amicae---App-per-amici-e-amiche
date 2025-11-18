@@ -349,7 +349,7 @@
             </div>
         </div>
 
-<!-- Vista Home -->
+        <!-- Vista Home -->
         <div id="home-view" class="app-view slide-from-bottom flex flex-col bg-custom-pink">
             <!-- Header Home -->
             <header class="bg-pink border-gray-200 p-4 flex items-center justify-between  flex-shrink-0 z-10">
@@ -487,7 +487,7 @@
                         <li>
                             <button id="theme-btn" class="w-full flex items-center p-4 text-gray-700 hover:bg-gray-50 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500 mr-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707.707M12 21v-1m0-16a9 9 0 110 18 9 9 0 010-18z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M12 21v-1m0-16a9 9 0 110 18 9 9 0 010-18z" />
                                 </svg>
                                 <span class="font-medium">Tema</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -721,7 +721,9 @@
                 </button>
             </div>
         </div>
-        <!-- Modale Aggiungi Evento -->
+        
+
+ <!-- Modale Aggiungi Evento -->
         <div id="add-event-modal" class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4 z-50 transition-opacity duration-300 opacity-0">
             <div id="add-event-modal-content" class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full transform transition-all scale-95 border border-gray-200">
                 <div class="flex justify-between items-center mb-4">
@@ -767,9 +769,6 @@
     </div> 
     
     <!-- **** INIZIO SCRIPT MODIFICATO **** -->
-    <!-- Carica il modulo della bacheca prima dello script principale -->
-    <script src="bacheca.js" type="module"></script>
-    
     <script type="module">
         // Importa funzioni Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -800,12 +799,9 @@
             setLogLevel,
             limit,
             orderBy,
-            getDocs,
+            getDocs, // <-- AGGIUNGI QUESTO
             deleteDoc
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // **** IMPORTA IL MODULO BACHECA ****
-        import { initializeBacheca } from './bacheca.js';
 
         // --- Variabili Globali (dall'ambiente Canvas) ---
         
@@ -860,19 +856,26 @@
         let partnerDiaryListenerUnsubscribe = null;
         let isSavingDiary = false; // Flag per evitare doppi salvataggi
 
-        // --- VARIABILI BACHECA RIMOSSE ---
-        // Tutta la logica della bacheca è ora in bacheca.js
-
-        // Oggetto per contenere le funzioni di controllo della bacheca
-        let whiteboardControls = { 
-            startWhiteboardView: () => {}, 
-            stopWhiteboardListeners: () => {} 
-        };
+  // --- NUOVE VARIABILI STATO BACHECA ---
+        let currentWhiteboardId = null;
+        let whiteboardStrokes = new Map(); // Cache locale dei tratti {docId: strokeData}
+        let currentDrawingStroke = null; // Tratto { points: [], color: '', ... }
+        let isDrawing = false;
+        let whiteboardStrokesUnsubscribe = null;
+        let whiteboardMetaUnsubscribe = null; // Per ascoltare le bacheche
+        let allWhiteboards = []; // Lista di tutte le bacheche
+        let currentBoardIndex = -1; // Indice della bacheca attuale
+        // Offset per il pan (per ora non implementato, ma predisposto)
+        let canvasOffsetX = 0;
+        let canvasOffsetY = 0;
 
         // Riferimenti DOM
         const views = {
-            // **** RIFERIMENTO BACHECA AGGIUNTO ****
-            whiteboard: document.getElementById('whiteboard-view'),
+            
+            
+            whiteboard: document.getElementById('whiteboard-view'), // <-- AGGIUNGI QUESTO
+        
+            
             loading: document.getElementById('loading-view'),
             welcome: document.getElementById('welcome-view'), 
             signup: document.getElementById('signup-view'),   
@@ -916,27 +919,15 @@
         const diaryNewBtn = document.getElementById('diary-new-btn');
         const diarySaveBtn = document.getElementById('diary-save-btn');
         
-        // --- RIFERIMENTI DOM BACHECA RIMOSSI ---
-
-        // **** INIZIALIZZA IL MODULO BACHECA ****
-        // Passa tutte le dipendenze necessarie
-        whiteboardControls = initializeBacheca({
-            db,
-            appId,
-            showMessage,
-            // Passa le funzioni firestore necessarie
-            collection,
-            doc,
-            addDoc,
-            onSnapshot,
-            query,
-            orderBy,
-            getDocs,
-            deleteDoc,
-            serverTimestamp
-        });
-
-
+        // --- NUOVI RIFERIMENTI DOM BACHECA ---
+        const whiteboardCanvas = document.getElementById('whiteboard-canvas');
+        const whiteboardCtx = whiteboardCanvas.getContext('2d');
+        const whiteboardContainer = document.getElementById('whiteboard-container');
+        const whiteboardBackBtn = document.getElementById('whiteboard-back-btn');
+        const whiteboardTitle = document.getElementById('whiteboard-title');
+        const whiteboardNewBtn = document.getElementById('whiteboard-new-btn');
+        const whiteboardClearBtn = document.getElementById('whiteboard-clear-btn');
+        
         // --- Funzioni di Utility ---
 
         /**
@@ -969,22 +960,8 @@
                 stopDiaryListeners();
             }
             
-            // **** BLOCCO BACHECA MODIFICATO ****
-            if (viewId === 'whiteboard') {
-                // Controlla se possiamo avviare la bacheca
-                if (!userId || !pairingCode) {
-                    showMessage("Errore: devi essere connesso per usare la bacheca.");
-                    // Forza il ritorno alla vista auth o home
-                    setTimeout(() => showView(userId ? 'home' : 'auth'), 0);
-                } else {
-                    // Avvia la bacheca passando lo stato attuale
-                    whiteboardControls.startWhiteboardView(userId, pairingCode);
-                }
-            } else {
-                // Interrompi i listener della bacheca se usciamo
-                whiteboardControls.stopWhiteboardListeners();
-            }
-            // **** FINE BLOCCO MODIFICATO ****
+
+            // **** FINE BLOCCO DA MODIFICARE/AGGIUNGERE ****
         }
         
         /**
@@ -1042,7 +1019,7 @@
             modalContent.classList.add('scale-95');
             setTimeout(() => messageModal.classList.add('hidden'), 300);
         });
-         /**
+          /**
          * NUOVO: Formattatore data per il diario
          */
         function formatDiaryTimestamp(timestamp) {
@@ -1249,6 +1226,7 @@
                 showMessage(error.message);
             }
         });
+
         document.getElementById('signin-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('signin-email').value;
@@ -1292,8 +1270,7 @@
                 if (eventsListenerUnsubscribe) eventsListenerUnsubscribe();
                 stopDiaryListeners(); // <-- NUOVO
                 
-                whiteboardControls.stopWhiteboardListeners(); // <-- MODIFICATO
-                
+                stopWhiteboardListeners(); // <-- AGGIUNGI QUESTO
                 pairingListenerUnsubscribe = null;
                 eventsListenerUnsubscribe = null;
                 
@@ -1522,7 +1499,8 @@
                 eventsCarousel.innerHTML += eventCardHTML;
             });
         }
-         // --- Listener Modale Eventi ---
+
+        // --- Listener Modale Eventi ---
         
         function openEventModal() {
             addEventForm.reset(); 
@@ -1617,7 +1595,7 @@
             }
             stopDiaryListeners(); // <-- NUOVO
             
-            whiteboardControls.stopWhiteboardListeners(); // <-- MODIFICATO
+            stopWhiteboardListeners(); // <-- AGGIUNGI QUESTO
 
             eventsCarousel.innerHTML = ''; 
             showView('auth');
@@ -1853,6 +1831,7 @@ diaryNextBtn.addEventListener('click', () => {
             }
             renderDiaryPage();
         });
+
         diaryNewBtn.addEventListener('click', async () => {
             if (currentDiaryView !== 'my' || !userId || !pairingCode) return;
 
@@ -1927,13 +1906,9 @@ diaryNextBtn.addEventListener('click', () => {
             }
         });
 
-        // --- **** LOGICA BACHECA (WHITEBOARD) RIMOSSA **** ---
-        // --- Tutta la logica è ora in bacheca.js e gestita tramite whiteboardControls ---
-
 
     </script>
     <!-- **** FINE SCRIPT MODIFICATO **** -->
 </body>
 </html>
 
-                                  
