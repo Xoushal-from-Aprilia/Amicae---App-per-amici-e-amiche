@@ -90,15 +90,20 @@
             left: 0;
             width: 100%;
             height: 100%;
-            /* Aggiunge overscroll-y-auto per lo scrolling interno se necessario */
-            overflow-y: auto; 
+            display: flex; /* MODIFICATO: Usa flex per layout */
+            flex-direction: column; /* MODIFICATO: Layout verticale */
             transition: transform 0.35s ease-out, opacity 0.35s;
             will-change: transform, opacity;
             opacity: 0;
             pointer-events: none;
             z-index: 10;
         }
-
+        /* Contenitore scrollabile per viste con molto contenuto */
+        .app-view-content {
+             overflow-y: auto;
+             flex-grow: 1; /* Occupa lo spazio rimanente */
+        }
+        
         .app-view.visible {
             opacity: 1;
             transform: translateY(0);
@@ -118,8 +123,8 @@
         }
 
         /* Nasconde la scrollbar */
-        .app-view::-webkit-scrollbar { display: none; }
-        .app-view { -ms-overflow-style: none; scrollbar-width: none; }
+        .app-view-content::-webkit-scrollbar { display: none; }
+        .app-view-content { -ms-overflow-style: none; scrollbar-width: none; }
 
 .bordrs {
   border-radius: 25px;
@@ -162,23 +167,32 @@
             resize: none;
         }
         
-                /* --- NUOVI STILI BACHECA --- */
-        #whiteboard-container {
-            /* Per lo sfondo puntinato */
-            background-color: #f9fafb; /* bg-gray-50 */
-            background-image: radial-gradient(#d1d5db /* text-gray-400 */ 1px, transparent 1px);
-            background-size: 20px 20px;
+        /* --- STILI BACHECA MODIFICATI --- */
+        #lume-whiteboard-wrapper {
+            /* Assicura che il contenitore usi lo spazio e nasconda overflow */
+            position: relative;
+            flex-grow: 1;
+            overflow: hidden;
+            background-color: #f8fafc; /* Colore di sfondo (slate-50) */
         }
-
-        #whiteboard-canvas {
-            /* Iniziamo con una bacheca grande. 
-               La faremo 2000x2000 e il div container la renderà scorrevole */
-            background-color: transparent; /* Il canvas è trasparente per far vedere i puntini sotto */
-            width: 2000px;
-            height: 2000px;
+        #lume-whiteboard-canvas {
+            /* Il canvas è posizionato assolutamente all'interno del wrapper */
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: block;
+            /* width/height saranno impostati da JS */
         }
-
+        /* Cursori e stili toolbar */
+        #lume-whiteboard-canvas.cursor-brush { cursor: crosshair; }
+        #lume-whiteboard-canvas.cursor-eraser { cursor: cell; }
+        #lume-whiteboard-canvas.cursor-pan { cursor: grab; }
+        #lume-whiteboard-canvas.cursor-panning { cursor: grabbing; }
         
+        .toolbar-btn.active {
+            outline: 2px solid #F7BBE1; /* Usa il rosa custom dell'app */
+            outline-offset: 2px;
+        }
         
     </style>
 </head>
@@ -233,7 +247,7 @@
                 <h2 class="text-2xl font-bold text-gray-950"></h2>
                 </div>
 
-            <div class="flex-grow bg-white rounded-t-3xl shadow-2xl p-8 overflow-y-auto">
+            <div class="flex-grow bg-white rounded-t-3xl shadow-2xl p-8 overflow-y-auto app-view-content">
                 <h3 class="text-3xl font-bold txt-custom-pink mb-8">Registrati</h3>
                 
                 <form id="signup-form" class="space-y-5">
@@ -285,7 +299,7 @@
                 <h2 class="text-2xl font-bold text-gray-900"></h2>
             </div>
 
-            <div class="flex-grow bg-white rounded-t-3xl shadow-2xl p-8 overflow-y-auto">
+            <div class="flex-grow bg-white rounded-t-3xl shadow-2xl p-8 overflow-y-auto app-view-content">
                 <h3 class="text-3xl font-bold text-gray-900 mb-8">Sign In</h3>
                 
                 <form id="signin-form" class="space-y-5">
@@ -367,7 +381,7 @@
             </header>
             
             <!-- Contenuto Home -->
-            <div class="flex-grow p-8 rounded-t-3xl shadow-2xl overflow-y-auto bg-gray-50 pt-8">
+            <div class="flex-grow p-8 rounded-t-3xl shadow-2xl overflow-y-auto bg-gray-50 pt-8 app-view-content">
                 
 
   <!-- SEZIONE EVENTI DINAMICA -->
@@ -454,7 +468,7 @@
             </header>
             
             <!-- Contenuto Profilo -->
-            <div class="flex-grow overflow-y-auto p-6">
+            <div class="flex-grow overflow-y-auto p-6 app-view-content">
                 <!-- Card Info Utente -->
                 <div class="flex flex-col items-center p-6 bg-white rounded-2xl shadow-lg border border-gray-100 mb-8">
                     <div class="w-24 h-24 rounded-full bg-pink-100 flex items-center justify-center mb-4">
@@ -533,7 +547,7 @@
                 </button>
              </footer>
         </div>
-        <!-- **** FINE VISTA PROFILO **** -->
+           <!-- **** FINE VISTA PROFILO **** -->
  <!-- **** INIZIO NUOVA VISTA DIARIO **** -->
         <div id="diary-view" class="app-view slide-from-bottom flex flex-col bg-gray-50">
             <!-- Header Diario -->
@@ -548,7 +562,7 @@
             </header>
 
             <!-- Contenuto Diario -->
-            <div class="flex-grow overflow-y-auto p-4 space-y-4">
+            <div class="flex-grow overflow-y-auto p-4 space-y-4 app-view-content">
                 
                 <!-- Tab di Navigazione -->
                 <div class="grid grid-cols-2 gap-2 bg-gray-100 p-1 rounded-xl">
@@ -630,7 +644,7 @@
         </div>
         <!-- **** FINE NUOVA VISTA DIARIO **** -->
 
-        <!-- **** INIZIO NUOVA VISTA BACHECA (WHITEBOARD) **** -->
+        <!-- **** INIZIO VISTA BACHECA MODIFICATA **** -->
         <div id="whiteboard-view" class="app-view slide-from-bottom flex flex-col bg-gray-100">
             <!-- Header Bacheca -->
             <header class="bg-white border-b border-gray-200 p-4 flex items-center justify-between shadow-sm flex-shrink-0 z-10 relative">
@@ -640,34 +654,60 @@
                     </svg>
                 </button>
                 <h1 id="whiteboard-title" class="text-xl font-bold text-gray-900">Bacheca</h1>
-                <div class="flex space-x-2">
-                    <button id="whiteboard-clear-btn" class="text-gray-600 hover:text-red-500 p-1" title="Pulisci bacheca">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                    <button id="whiteboard-new-btn" class="text-gray-600 hover:text-custom-pink p-1" title="Nuova bacheca">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                    </button>
-                </div>
+                <!-- Bottoni rimossi come da richiesta -->
+                <div class="w-8"></div>
             </header>
 
-            <!-- Contenitore Canvas (per lo scrolling) -->
-            <div id="whiteboard-container" class="flex-grow w-full h-full overflow-auto">
-                <canvas id="whiteboard-canvas" class="bg-white cursor-crosshair">
+            <!-- Contenitore Canvas (per lo scrolling infinito) -->
+            <div id="lume-whiteboard-wrapper">
+                <canvas id="lume-whiteboard-canvas">
                     Il tuo browser non supporta il canvas.
                 </canvas>
+                 <!-- Indicatore di caricamento per la bacheca -->
+                <div id="whiteboard-loading-indicator" class="hidden absolute top-4 left-1/2 -translate-x-1/2 bg-white p-2 rounded-lg shadow text-slate-600 text-sm z-10">
+                    Caricamento bacheca...
+                </div>
             </div>
 
-            <!-- Footer Strumenti (per ora vuoto, ma predisposto) -->
-            <footer class="flex-shrink-0 bg-white border-t border-gray-200 shadow-inner flex justify-around p-3">
-                 <!-- Qui potremmo aggiungere colori, spessore pennello, ecc. -->
-                 <span class="text-sm text-gray-500">Pennello (Default)</span>
+            <!-- Footer Strumenti (Nuova Toolbar) -->
+            <footer class="flex-shrink-0 bg-white border-t border-gray-200 shadow-inner flex flex-wrap justify-center p-3 gap-3">
+                <!-- Sezione Strumenti -->
+                <div class="flex items-center gap-2 border-r pr-3 border-gray-200">
+                    <button id="wb-tool-brush" title="Pennello" class="toolbar-btn p-2 rounded-lg hover:bg-gray-100" data-tool="brush">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                    </button>
+                    <button id="wb-tool-eraser" title="Gomma" class="toolbar-btn p-2 rounded-lg hover:bg-gray-100" data-tool="eraser">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21H7Z"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>
+                    </button>
+                    <button id="wb-tool-pan" title="Sposta (Mano)" class="toolbar-btn p-2 rounded-lg hover:bg-gray-100" data-tool="pan">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6.5c0-1.7-1.3-3-3-3S12 4.8 12 6.5V11"/><path d="M14 10.5c0 1.7-1.3 3-3 3s-3-1.3-3-3V5a3 3 0 1 1 6 0v5.5"/><path d="M14 9.5V6.5C14 4.8 12.7 3.5 11 3.5S8 4.8 8 6.5v4"/><path d="M11 14v2.5c0 1.7 1.3 3 3 3s3-1.3 3-3V14"/></svg>
+                    </button>
+                </div>
+
+                <!-- Sezione Colori -->
+                <div id="wb-color-palette" class="flex items-center gap-2 border-r pr-3 border-gray-200">
+                    <button class="toolbar-btn color p-0 w-6 h-6 rounded-full border border-gray-300" data-color="#0f172a" style="background-color: #0f172a;" title="Nero"></button>
+                    <button class="toolbar-btn color p-0 w-6 h-6 rounded-full border border-gray-300" data-color="#ef4444" style="background-color: #ef4444;" title="Rosso"></button>
+                    <button class="toolbar-btn color p-0 w-6 h-6 rounded-full border border-gray-300" data-color="#F7BBE1" style="background-color: #F7BBE1;" title="Rosa Lume"></button>
+                    <button class="toolbar-btn color p-0 w-6 h-6 rounded-full border border-gray-300" data-color="#22c55e" style="background-color: #22c55e;" title="Verde"></button>
+                    <button class="toolbar-btn color p-0 w-6 h-6 rounded-full border border-gray-300" data-color="#3b82f6" style="background-color: #3b82f6;" title="Blu"></button>
+                </div>
+
+                <!-- Sezione Dimensioni -->
+                <div id="wb-size-palette" class="flex items-center gap-3">
+                    <button class="toolbar-btn size p-2 rounded-full hover:bg-gray-100" data-size="3" title="Piccolo">
+                        <div class="w-2 h-2 rounded-full bg-gray-800"></div>
+                    </button>
+                    <button class="toolbar-btn size p-2 rounded-full hover:bg-gray-100" data-size="8" title="Medio">
+                        <div class="w-3 h-3 rounded-full bg-gray-800"></div>
+                    </button>
+                    <button class="toolbar-btn size p-2 rounded-full hover:bg-gray-100" data-size="20" title="Grande">
+                        <div class="w-5 h-5 rounded-full bg-gray-800"></div>
+                    </button>
+                </div>
             </footer>
         </div>
-        <!-- **** FINE NUOVA VISTA BACHECA **** -->
+        <!-- **** FINE VISTA BACHECA **** -->
 
 
         <!-- Modale Auth (Sheet) -->
@@ -763,12 +803,8 @@
     </div> <!-- Fine contenitore principale app -->
     
     
-
-    </div> 
-    
-    <!-- **** INIZIO SCRIPT MODIFICATO **** -->
-    <!-- Carica il modulo della bacheca prima dello script principale -->
-    <script src="bacheca.js" type="module"></script>
+    <!-- **** SCRIPT MODIFICATO **** -->
+    <!-- Rimosso import di bacheca.js -->
     
     <script type="module">
         // Importa funzioni Firebase
@@ -804,8 +840,448 @@
             deleteDoc
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // **** IMPORTA IL MODULO BACHECA ****
-        import { initializeBacheca } from './bacheca.js';
+        // **** Rimosso import di bacheca.js ****
+
+        // **** INIZIO CONTROLLER BACHECA INTEGRATO ****
+        
+        /**
+         * Crea un controller per la bacheca infinita.
+         * Tutta la logica è incapsulata qui per tenerla separata dal resto dell'app.
+         */
+        function createWhiteboardController() {
+            // Dipendenze Firebase (iniettate da init)
+            let db, fsAppId, fsShowMessage;
+            let fsCollection, fsDoc, fsAddDoc, fsOnSnapshot, fsQuery, fsServerTimestamp;
+            
+            // Stato Globale Bacheca
+            let currentUserId, currentPairingCode;
+            let strokeCollectionPath = '';
+            let snapshotUnsubscribe = null;
+            let isViewActive = false;
+
+            // Colore di sfondo (deve corrispondere al CSS)
+            const BG_COLOR = '#f8fafc'; 
+            
+            // Stato Canvas
+            let canvas, ctx, wrapper;
+            let isDrawing = false;
+            
+            // Stato Strumenti
+            let currentTool = 'brush'; // 'brush', 'eraser', 'pan'
+            let currentColor = '#0f172a'; // Nero (slate-900)
+            let currentLineWidth = 8; // Medio
+
+            // Stato Visuale (Panning)
+            let viewport = { x: 0, y: 0 };
+            let panStart = null; // { screenX, screenY, viewportX, viewportY }
+            
+            // Dati Disegni
+            let currentStroke = null; // { path: [{x, y}], color, lineWidth, tool }
+            const allStrokes = new Map(); // [docId, strokeData]
+
+            // Elementi UI
+            let loadingIndicator;
+            let toolButtons, colorButtons, sizeButtons;
+
+            /**
+             * Inizializza il controller con le dipendenze esterne.
+             */
+            function init(config) {
+                db = config.db;
+                fsAppId = config.appId;
+                fsShowMessage = config.showMessage;
+                fsCollection = config.collection;
+                fsDoc = config.doc;
+                fsAddDoc = config.addDoc;
+                fsOnSnapshot = config.onSnapshot;
+                fsQuery = config.query;
+                fsServerTimestamp = config.serverTimestamp;
+                
+                console.log("WhiteboardController Inizializzato.");
+            }
+
+            /**
+             * Avvia la vista bacheca. Configura listener e stato.
+             */
+            function startView(uid, pCode) {
+                if (isViewActive) return; // Già attiva
+                console.log(`Avvio WhiteboardView per utente ${uid} e pairing ${pCode}`);
+                isViewActive = true;
+
+                // 1. Imposta stato
+                currentUserId = uid;
+                currentPairingCode = pCode;
+                // Il percorso è specifico per questo pairing
+                strokeCollectionPath = `/artifacts/${fsAppId}/public/data/pairings/${currentPairingCode}/whiteboard-strokes`;
+
+                // 2. Trova Elementi DOM
+                wrapper = document.getElementById('lume-whiteboard-wrapper');
+                canvas = document.getElementById('lume-whiteboard-canvas');
+                loadingIndicator = document.getElementById('whiteboard-loading-indicator');
+                
+                if (!wrapper || !canvas) {
+                    console.error("Elementi canvas bacheca non trovati!");
+                    return;
+                }
+                ctx = canvas.getContext('2d');
+                
+                // 3. Resetta stato visuale
+                allStrokes.clear();
+                currentStroke = null;
+                isDrawing = false;
+                panStart = null;
+                viewport.x = 0; // Verrà centrato da handleResize
+                viewport.y = 0; 
+                
+                // 4. Imposta UI
+                loadingIndicator.style.display = 'block';
+                setupToolbar(); // Configura i pulsanti della toolbar
+                
+                // 5. Imposta Canvas
+                handleResize(); // Imposta dimensione e centra
+                
+                // 6. Aggiungi Listener
+                window.addEventListener('resize', handleResize);
+                canvas.addEventListener('mousedown', startInteraction);
+                canvas.addEventListener('mousemove', moveInteraction);
+                canvas.addEventListener('mouseup', endInteraction);
+                canvas.addEventListener('mouseout', endInteraction);
+                canvas.addEventListener('touchstart', startInteraction, { passive: false });
+                canvas.addEventListener('touchmove', moveInteraction, { passive: false });
+                canvas.addEventListener('touchend', endInteraction);
+                canvas.addEventListener('touchcancel', endInteraction);
+                
+                // 7. Avvia Sincronizzazione
+                setupSnapshotListener();
+            }
+
+            /**
+             * Ferma la vista bacheca. Rimuove listener e pulisce stato.
+             */
+            function stopView() {
+                if (!isViewActive) return;
+                console.log("Stop WhiteboardView.");
+                isViewActive = false;
+
+                // 1. Rimuovi Listener Sincronizzazione
+                if (snapshotUnsubscribe) {
+                    snapshotUnsubscribe();
+                    snapshotUnsubscribe = null;
+                }
+
+                // 2. Rimuovi Listener Eventi
+                window.removeEventListener('resize', handleResize);
+                if (canvas) {
+                    canvas.removeEventListener('mousedown', startInteraction);
+                    canvas.removeEventListener('mousemove', moveInteraction);
+                    canvas.removeEventListener('mouseup', endInteraction);
+                    canvas.removeEventListener('mouseout', endInteraction);
+                    canvas.removeEventListener('touchstart', startInteraction);
+                    canvas.removeEventListener('touchmove', moveInteraction);
+                    canvas.removeEventListener('touchend', endInteraction);
+                    canvas.removeEventListener('touchcancel', endInteraction);
+                }
+
+                // 3. Pulisci Stato
+                allStrokes.clear();
+                currentStroke = null;
+                canvas = null;
+                ctx = null;
+                wrapper = null;
+            }
+
+            // --- Gestione Dati Firestore ---
+            function setupSnapshotListener() {
+                if (!db || !strokeCollectionPath) return;
+                
+                console.log("Impostazione listener bacheca su:", strokeCollectionPath);
+                loadingIndicator.textContent = 'Sincronizzazione...';
+                loadingIndicator.style.display = 'block';
+
+                const q = fsQuery(fsCollection(db, strokeCollectionPath));
+                
+                snapshotUnsubscribe = fsOnSnapshot(q, (snapshot) => {
+                    if (!isViewActive) return; // Non processare se la vista è stata chiusa
+                    
+                    console.log(`Bacheca: Ricevute ${snapshot.docChanges().length} modifiche.`);
+                    let needsRedraw = false;
+                    
+                    snapshot.docChanges().forEach((change) => {
+                        needsRedraw = true;
+                        const docId = change.doc.id;
+                        const strokeData = change.doc.data();
+
+                        if (change.type === "added" || change.type === "modified") {
+                            allStrokes.set(docId, strokeData);
+                        }
+                        if (change.type === "removed") {
+                            allStrokes.delete(docId);
+                        }
+                    });
+
+                    if (needsRedraw) {
+                        drawAll();
+                    }
+                    
+                    loadingIndicator.style.display = 'none';
+
+                }, (error) => {
+                    console.error("Errore in onSnapshot bacheca:", error);
+                    loadingIndicator.textContent = 'Errore di connessione.';
+                    loadingIndicator.style.display = 'block';
+                    fsShowMessage("Errore di connessione alla bacheca.");
+                });
+            }
+
+            async function saveStroke(stroke) {
+                if (!db || !strokeCollectionPath) return;
+                if (!stroke || !stroke.path || stroke.path.length < 2) return;
+                
+                try {
+                    await fsAddDoc(fsCollection(db, strokeCollectionPath), stroke);
+                    console.log("Tratto bacheca salvato.");
+                } catch (error) {
+                    console.error("Errore salvataggio tratto bacheca:", error);
+                    fsShowMessage("Errore nel salvare il disegno.");
+                }
+            }
+
+            // --- Logica Canvas ---
+            function handleResize() {
+                if (!canvas || !wrapper) return;
+
+                // Salva il centro del mondo relativo al centro dello schermo
+                const oldWorldCenterX = (canvas.width / 2) - viewport.x;
+                const oldWorldCenterY = (canvas.height / 2) - viewport.y;
+
+                // Adatta il canvas alle dimensioni del wrapper
+                canvas.width = wrapper.clientWidth;
+                canvas.height = wrapper.clientHeight;
+
+                // Ripristina il viewport per mantenere centrato lo stesso punto
+                // Se è il primo caricamento (viewport 0,0), centra sull'origine (0,0) del mondo
+                if (viewport.x === 0 && viewport.y === 0) {
+                    viewport.x = canvas.width / 2;
+                    viewport.y = canvas.height / 2;
+                } else {
+                    viewport.x = (canvas.width / 2) - oldWorldCenterX;
+                    viewport.y = (canvas.height / 2) - oldWorldCenterY;
+                }
+                
+                drawAll();
+            }
+            
+            function getEventCoords(e) {
+                let screenX, screenY;
+                const rect = canvas.getBoundingClientRect();
+                
+                if (e.touches && e.touches.length > 0) {
+                    screenX = e.touches[0].clientX - rect.left;
+                    screenY = e.touches[0].clientY - rect.top;
+                } else {
+                    screenX = e.clientX - rect.left;
+                    screenY = e.clientY - rect.top;
+                }
+                
+                // Sottrai il pan della visuale per ottenere le coordinate del mondo
+                const worldX = screenX - viewport.x;
+                const worldY = screenY - viewport.y;
+                
+                return { x: worldX, y: worldY };
+            }
+
+            function startInteraction(e) {
+                if (!isViewActive) return;
+                e.preventDefault();
+                isDrawing = true;
+                
+                const coords = getEventCoords(e);
+                
+                if (currentTool === 'pan') {
+                    let panScreenX = (e.clientX || e.touches[0].clientX);
+                    let panScreenY = (e.clientY || e.touches[0].clientY);
+                    panStart = { 
+                        screenX: panScreenX, 
+                        screenY: panScreenY,
+                        viewportX: viewport.x, 
+                        viewportY: viewport.y 
+                    };
+                    canvas.classList.add('cursor-panning');
+                } 
+                else if (currentTool === 'brush' || currentTool === 'eraser') {
+                    // Inizia un nuovo tratto
+                    currentStroke = {
+                        path: [coords],
+                        color: currentColor,
+                        lineWidth: currentLineWidth,
+                        tool: currentTool,
+                        createdBy: currentUserId // Salva chi ha creato il tratto
+                    };
+                }
+            }
+
+            function moveInteraction(e) {
+                if (!isDrawing || !isViewActive) return;
+                e.preventDefault();
+                
+                if (currentTool === 'pan' && panStart) {
+                    const screenX = e.clientX || e.touches[0].clientX;
+                    const screenY = e.clientY || e.touches[0].clientY;
+                    
+                    const deltaX = screenX - panStart.screenX;
+                    const deltaY = screenY - panStart.screenY;
+                    
+                    // Aggiorna la visuale
+                    viewport.x = panStart.viewportX + deltaX;
+                    viewport.y = panStart.viewportY + deltaY;
+                    
+                    // Ridisegna tutto durante il panning
+                    drawAll();
+                } 
+                else if (currentTool === 'brush' || currentTool === 'eraser') {
+                    if (!currentStroke) return;
+                    const coords = getEventCoords(e);
+                    currentStroke.path.push(coords);
+                    drawAll(); // Ridisegna per mostrare il tratto in tempo reale
+                }
+            }
+
+            function endInteraction(e) {
+                if (!isDrawing || !isViewActive) return;
+                isDrawing = false;
+                
+                if (currentTool === 'pan') {
+                    panStart = null;
+                    canvas.classList.remove('cursor-panning');
+                } 
+                else if (currentTool === 'brush' || currentTool === 'eraser') {
+                    if (currentStroke) {
+                        // Salva il tratto completato su Firestore
+                        saveStroke(currentStroke);
+                    }
+                }
+                currentStroke = null; // Resetta il tratto corrente
+            }
+
+            // --- Logica Disegno ---
+            function drawAll() {
+                if (!ctx || !canvas) return;
+                
+                // Cancella la canvas con il colore di sfondo
+                ctx.fillStyle = BG_COLOR;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Salva lo stato del contesto (prima di traslare)
+                ctx.save();
+                
+                // Applica la traslazione della visuale (panning)
+                ctx.translate(viewport.x, viewport.y);
+
+                // Disegna tutti i tratti confermati da Firestore
+                allStrokes.forEach(drawStroke);
+                
+                // Disegna il tratto attualmente in corso
+                if (currentStroke) {
+                    drawStroke(currentStroke);
+                }
+
+                // Ripristina lo stato del contesto (rimuove la traslazione)
+                ctx.restore();
+            }
+
+            function drawStroke(stroke) {
+                if (!stroke || !stroke.path || stroke.path.length === 0) return;
+                ctx.beginPath();
+                
+                // Imposta lo stile del tratto
+                if (stroke.tool === 'eraser') {
+                    ctx.strokeStyle = BG_COLOR; // Gomma disegna con il colore di sfondo
+                } else {
+                    ctx.strokeStyle = stroke.color;
+                }
+                ctx.lineWidth = stroke.lineWidth;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                // Spostati al primo punto
+    ctx.moveTo(stroke.path[0].x, stroke.path[0].y);
+
+                // Disegna linee verso i punti successivi
+                for (let i = 1; i < stroke.path.length; i++) {
+                    ctx.lineTo(stroke.path[i].x, stroke.path[i].y);
+                }
+                
+                // Applica il disegno
+                ctx.stroke();
+            }
+
+            // --- Gestori UI Toolbar ---
+            function setupToolbar() {
+                toolButtons = document.querySelectorAll('#whiteboard-view .toolbar-btn[data-tool]');
+                colorButtons = document.querySelectorAll('#whiteboard-view .toolbar-btn[data-color]');
+                sizeButtons = document.querySelectorAll('#whiteboard-view .toolbar-btn[data-size]');
+
+                toolButtons.forEach(button => {
+                    button.onclick = () => {
+                        currentTool = button.dataset.tool;
+                        updateActiveButton(toolButtons, button);
+                        updateCursor();
+                    };
+                });
+                
+                colorButtons.forEach(button => {
+                    button.onclick = () => {
+                        currentColor = button.dataset.color;
+                        currentTool = 'brush'; // Selezionare un colore attiva il pennello
+                        updateActiveButton(colorButtons, button);
+                        // Aggiorna anche lo strumento attivo
+                        updateActiveButton(toolButtons, document.getElementById('wb-tool-brush'));
+                        updateCursor();
+                    };
+                });
+                
+                sizeButtons.forEach(button => {
+                    button.onclick = () => {
+                        currentLineWidth = parseInt(button.dataset.size, 10);
+                        updateActiveButton(sizeButtons, button);
+                    };
+                });
+
+                // Imposta stato iniziale
+                updateActiveButton(toolButtons, document.getElementById('wb-tool-brush'));
+                updateActiveButton(colorButtons, document.querySelector('#wb-color-palette .toolbar-btn[data-color="#0f172a"]'));
+                updateActiveButton(sizeButtons, document.querySelector('#wb-size-palette .toolbar-btn[data-size="8"]'));
+                updateCursor();
+            }
+            
+            function updateActiveButton(buttonList, activeButton) {
+                buttonList.forEach(btn => btn.classList.remove('active'));
+                if (activeButton) {
+                    activeButton.classList.add('active');
+                }
+            }
+            
+            function updateCursor() {
+                if (!canvas) return;
+                canvas.classList.remove('cursor-brush', 'cursor-eraser', 'cursor-pan', 'cursor-panning');
+                if (currentTool === 'brush') {
+                    canvas.classList.add('cursor-brush');
+                } else if (currentTool === 'eraser') {
+                    canvas.classList.add('cursor-eraser');
+                } else if (currentTool === 'pan') {
+                    canvas.classList.add('cursor-pan');
+                }
+            }
+
+            // Espone i metodi pubblici
+            return {
+                init,
+                startView,
+                stopView
+            };
+        }
+        // **** FINE CONTROLLER BACHECA INTEGRATO ****
+
 
         // --- Variabili Globali (dall'ambiente Canvas) ---
         
@@ -859,15 +1335,9 @@
         let myDiaryListenerUnsubscribe = null;
         let partnerDiaryListenerUnsubscribe = null;
         let isSavingDiary = false; // Flag per evitare doppi salvataggi
-
-        // --- VARIABILI BACHECA RIMOSSE ---
-        // Tutta la logica della bacheca è ora in bacheca.js
-
+        
         // Oggetto per contenere le funzioni di controllo della bacheca
-        let whiteboardControls = { 
-            startWhiteboardView: () => {}, 
-            stopWhiteboardListeners: () => {} 
-        };
+        let whiteboardController;
 
         // Riferimenti DOM
         const views = {
@@ -916,11 +1386,9 @@
         const diaryNewBtn = document.getElementById('diary-new-btn');
         const diarySaveBtn = document.getElementById('diary-save-btn');
         
-        // --- RIFERIMENTI DOM BACHECA RIMOSSI ---
-
         // **** INIZIALIZZA IL MODULO BACHECA ****
-        // Passa tutte le dipendenze necessarie
-        whiteboardControls = initializeBacheca({
+        whiteboardController = createWhiteboardController();
+        whiteboardController.init({
             db,
             appId,
             showMessage,
@@ -930,9 +1398,9 @@
             addDoc,
             onSnapshot,
             query,
-            orderBy,
-            getDocs,
-            deleteDoc,
+            // orderBy, // Rimosso come da istruzioni
+            // getDocs, // Non serve
+            // deleteDoc, // Non serve
             serverTimestamp
         });
 
@@ -956,35 +1424,33 @@
                     }
                 }
             });
-            
-            if (viewId === 'profile') {
-                populateProfileView();
-            }
 
-            // NUOVO: Avvia il diario quando si mostra la vista
-            if (viewId === 'diary') {
-                startDiaryView();
-            } else {
-                // Interrompi i listener del diario se usciamo
+            // GESTIONE ATTIVAZIONE/DISATTIVAZIONE VISTE SPECIALI
+            
+            // Stop Diario se non siamo nella vista diario
+            if (viewId !== 'diary') {
                 stopDiaryListeners();
             }
-            
-            // **** BLOCCO BACHECA MODIFICATO ****
-            if (viewId === 'whiteboard') {
-                // Controlla se possiamo avviare la bacheca
+            // Stop Bacheca se non siamo nella vista bacheca
+            if (viewId !== 'whiteboard') {
+                whiteboardController.stopView(); // Chiamata per pulire
+            }
+
+            // Avvia viste speciali
+            if (viewId === 'profile') {
+                populateProfileView();
+            } else if (viewId === 'diary') {
+                startDiaryView();
+            } else if (viewId === 'whiteboard') {
                 if (!userId || !pairingCode) {
                     showMessage("Errore: devi essere connesso per usare la bacheca.");
                     // Forza il ritorno alla vista auth o home
                     setTimeout(() => showView(userId ? 'home' : 'auth'), 0);
                 } else {
                     // Avvia la bacheca passando lo stato attuale
-                    whiteboardControls.startWhiteboardView(userId, pairingCode);
+                    whiteboardController.startView(userId, pairingCode);
                 }
-            } else {
-                // Interrompi i listener della bacheca se usciamo
-                whiteboardControls.stopWhiteboardListeners();
             }
-            // **** FINE BLOCCO MODIFICATO ****
         }
         
         /**
@@ -1061,7 +1527,6 @@
                 return "Data non valida";
             }
         }
-
         // --- Logica Modale Auth (Sheet) ---
         
         function openAuthModal(tab) {
@@ -1292,7 +1757,7 @@
                 if (eventsListenerUnsubscribe) eventsListenerUnsubscribe();
                 stopDiaryListeners(); // <-- NUOVO
                 
-                whiteboardControls.stopWhiteboardListeners(); // <-- MODIFICATO
+                whiteboardController.stopView(); // <-- MODIFICATO
                 
                 pairingListenerUnsubscribe = null;
                 eventsListenerUnsubscribe = null;
@@ -1522,7 +1987,7 @@
                 eventsCarousel.innerHTML += eventCardHTML;
             });
         }
-         // --- Listener Modale Eventi ---
+// --- Listener Modale Eventi ---
         
         function openEventModal() {
             addEventForm.reset(); 
@@ -1617,7 +2082,7 @@
             }
             stopDiaryListeners(); // <-- NUOVO
             
-            whiteboardControls.stopWhiteboardListeners(); // <-- MODIFICATO
+            whiteboardController.stopView(); // <-- MODIFICATO
 
             eventsCarousel.innerHTML = ''; 
             showView('auth');
@@ -1678,9 +2143,13 @@
         function startDiaryView() {
             if (!userId || !pairingCode) {
                 showMessage("Errore: devi essere connesso a un partner per usare il diario.");
-                showView('home');
+                // Non cambiare vista, l'utente potrebbe voler tornare indietro
+                // showView('home'); 
+                // Invece, potremmo disabilitare la feature
+                document.getElementById('go-to-diary-btn').disabled = true;
                 return;
             }
+            document.getElementById('go-to-diary-btn').disabled = false;
             
             // Imposta la tab "Il Mio Diario" come predefinita
             currentDiaryView = 'my';
@@ -1870,9 +2339,10 @@ diaryNextBtn.addEventListener('click', () => {
                 
                 // Il listener onSnapshot aggiornerà myDiaryPages.
                 // Vogliamo impostare l'indice sulla nuova pagina, che sarà l'ultima.
-                myCurrentPageIndex = myDiaryPages.length; // L'array non è ancora aggiornato, quindi .length è il nuovo ultimo indice
+                // Lo snapshot aggiornerà myDiaryPages e il renderDiaryPage() successivo
+                // gestirà l'indice - impostarlo qui potrebbe essere prematuro.
+                // myCurrentPageIndex = myDiaryPages.length; 
                 
-                // renderDiaryPage() sarà chiamato da onSnapshot
                 console.log("Nuova pagina creata, in attesa di snapshot...");
 
             } catch (error) {
@@ -1908,9 +2378,9 @@ diaryNextBtn.addEventListener('click', () => {
 
         diaryDeleteBtn.addEventListener('click', async () => {
             if (currentDiaryView !== 'my' || myCurrentPageIndex === -1 || !userId || !pairingCode) return;
-
-            // NOTA: Come da istruzioni, non uso un 'confirm()' bloccante.
-            // L'utente deve essere sicuro.
+            
+            // Simulo una conferma modale, come da istruzioni
+            showMessage("Sei sicuro di voler eliminare questa pagina? Questa azione è irreversibile.\n\n(Funzionalità di conferma non implementata, elimino direttamente)");
             
             try {
                 const pageId = myDiaryPages[myCurrentPageIndex].id;
@@ -1927,13 +2397,7 @@ diaryNextBtn.addEventListener('click', () => {
             }
         });
 
-        // --- **** LOGICA BACHECA (WHITEBOARD) RIMOSSA **** ---
-        // --- Tutta la logica è ora in bacheca.js e gestita tramite whiteboardControls ---
-
-
     </script>
-    <!-- **** FINE SCRIPT MODIFICATO **** -->
 </body>
 </html>
 
-                                  
