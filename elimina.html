@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elimina Account - Lume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb; /* bg-gray-50 */
+        }
+        /* Colori Lume */
+        .bg-custom-pink { 
+            background-color: #F7BBE1;
+            color: #333;
+            border-color: #F7BBE1;
+        }
+        .bg-custom-pink:hover {
+             opacity: 0.9;
+        }
+        .txt-custom-pink { 
+            color: #F7BBE1;
+        }
+        .ring-pink {
+            --tw-ring-color: #F7BBE1;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-md mx-auto bg-white shadow-2xl rounded-2xl p-8">
+
+        <!-- Vista Caricamento -->
+        <div id="loading-view">
+            <h2 class="text-2xl font-bold text-center text-gray-800">Caricamento...</h2>
+            <p class="text-center text-gray-500 mt-2">Connessione a Firebase...</p>
+        </div>
+
+        <!-- Vista Login -->
+        <div id="login-view" class="hidden">
+            <h2 class="text-3xl font-bold text-center txt-custom-pink mb-6">Accedi per Eliminare</h2>
+            <form id="login-form" class="space-y-5">
+                <div>
+                    <label for="login-email" class="block text-sm font-medium text-gray-600 mb-1">Email</label>
+                    <input id="login-email" type="email" placeholder="tua@email.com" class="w-full px-4 py-3 text-md rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-pink" required>
+                </div>
+                <div>
+                    <label for="login-password" class="block text-sm font-medium text-gray-600 mb-1">Password</label>
+                    <input id="login-password" type="password" placeholder="••••••••" class="w-full px-4 py-3 text-md rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-pink" required>
+                </div>
+                <button id="login-btn" type="submit" class="w-full bg-custom-pink text-gray-900 font-semibold py-3 px-6 rounded-xl shadow-lg transition-all hover:bg-custom-pink active:scale-[0.99]">
+                    Accedi
+                </button>
+                <p id="login-error" class="text-sm text-center text-red-600"></p>
+            </form>
+        </div>
+
+        <!-- Vista Eliminazione -->
+        <div id="delete-view" class="hidden">
+            <h2 class="text-3xl font-bold text-center text-red-600 mb-4">Elimina Account</h2>
+            <p class="text-center text-gray-600 mb-4">Ciao, <strong id="user-email"></strong>!</p>
+            <p class="text-center text-gray-700 mb-6">
+                Questa azione è <strong>irreversibile</strong>. Per confermare l'eliminazione del tuo account, inserisci la tua password.
+            </p>
+            <form id="delete-form" class="space-y-5">
+                <div>
+                    <label for="delete-password" class="block text-sm font-medium text-gray-600 mb-1">Conferma Password</label>
+                    <input id="delete-password" type="password" placeholder="••••••••" class="w-full px-4 py-3 text-md rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-red-500" required>
+                </div>
+                <button id="delete-btn" type="submit" class="w-full bg-red-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-all hover:bg-red-700 active:scale-[0.99]">
+                    Elimina il mio account definitivamente
+                </button>
+                <p id="delete-status" class="text-sm text-center text-red-600"></p>
+            </form>
+             <button id="logout-btn" class="w-full text-center text-gray-500 text-sm mt-6 hover:underline">
+                Annulla (Esci)
+            </button>
+        </div>
+
+        <!-- Vista per Account Social -->
+        <div id="social-view" class="hidden">
+             <h2 class="text-2xl font-bold text-center text-gray-800 mb-4">Eliminazione non supportata</h2>
+             <p class="text-center text-gray-600">
+                Il tuo account è stato creato tramite un provider social (Google, Facebook, ecc.). Per eliminare il tuo account, devi farlo dall'interno dell'app Lume principale o contattare il supporto.
+             </p>
+             <button id="social-logout-btn" class="w-full text-center text-gray-500 text-sm mt-6 hover:underline">
+                Esci
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        // Importa funzioni Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged,
+            signInWithEmailAndPassword,   
+            EmailAuthProvider,
+            reauthenticateWithCredential,
+            deleteUser,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            deleteDoc,
+            setLogLevel
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Configurazione Firebase (dal tuo file ulrima.txt)
+        // Uso la fallback config perché questa pagina è standalone
+        const firebaseConfig = {
+            apiKey: "AIzaSyDHALYDfyXQIiEzc8IfH7aKjiyXNAWX4_0",
+            authDomain: "amicae-99c7b.firebaseapp.com",
+            projectId: "amicae-99c7b",
+            storageBucket: "amicae-99c7b.firebasestorage.app",
+            messagingSenderId: "379845487963",
+            appId: "1:379845487963:web:e73dc5c970e627676c7e7e",
+            measurementId: "G-LYV92RTCX7"
+        };
+        
+        // Inizializzazione Firebase
+        let app, auth, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            setLogLevel('Debug');
+        } catch (e) {
+            console.error("Errore inizializzazione Firebase:", e);
+            document.getElementById('loading-view').innerHTML = '<h2 class="text-xl font-semibold text-red-600">Errore di configurazione.</h2>';
+        }
+
+        // Riferimenti DOM
+        const views = {
+            loading: document.getElementById('loading-view'),
+            login: document.getElementById('login-view'),
+            delete: document.getElementById('delete-view'),
+            social: document.getElementById('social-view')
+        };
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const deleteForm = document.getElementById('delete-form');
+        const deleteStatus = document.getElementById('delete-status');
+        const userEmailEl = document.getElementById('user-email');
+        const logoutBtn = document.getElementById('logout-btn');
+        const socialLogoutBtn = document.getElementById('social-logout-btn');
+
+        // Funzione per mostrare le viste
+        function showView(viewId) {
+            Object.keys(views).forEach(key => {
+                views[key].classList.add('hidden');
+            });
+            if (views[viewId]) {
+                views[viewId].classList.remove('hidden');
+            }
+        }
+
+        // Gestore stato autenticazione
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Utente è loggato
+                console.log("Utente trovato:", user.email);
+
+                // Controlla se l'utente ha una password (non è un account social)
+                const isPasswordProvider = user.providerData.some(
+                    (provider) => provider.providerId === 'password'
+                );
+
+                if (isPasswordProvider) {
+                    userEmailEl.textContent = user.email;
+                    showView('delete');
+                } else {
+                    // È un account social (Google, Facebook, ecc.)
+                    console.warn("Account social, eliminazione non supportata da questa pagina.");
+                    showView('social');
+                }
+            } else {
+                // Utente non loggato
+                console.log("Nessun utente loggato.");
+                showView('login');
+            }
+        });
+
+        // Listener Form di Login
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            loginError.textContent = "";
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                // onAuthStateChanged gestirà il cambio vista
+            } catch (error) {
+                console.error("Errore login:", error.code);
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
+                    loginError.textContent = "Email o password non corretti.";
+                } else {
+                    loginError.textContent = "Errore durante l'accesso. Riprova.";
+                }
+            }
+        });
+
+        // Listener Form di Eliminazione
+        deleteForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = document.getElementById('delete-password').value;
+            deleteStatus.textContent = "Eliminazione in corso...";
+
+            const user = auth.currentUser;
+            if (!user) {
+                deleteStatus.textContent = "Errore: utente non trovato. Ricarica la pagina.";
+                return;
+            }
+
+            // 1. Chiedi a Firebase di ri-autenticare l'utente
+            const credential = EmailAuthProvider.credential(user.email, password);
+
+            try {
+                await reauthenticateWithCredential(user, credential);
+                console.log("Ri-autenticazione riuscita.");
+
+                // 2. Eliminare dati utente da Firestore
+                try {
+                    console.log(`Eliminazione documento: users/${user.uid}`);
+                    await deleteDoc(doc(db, 'users', user.uid));
+                    console.log("Dati utente eliminati da Firestore.");
+                } catch (dbError) {
+                    console.error("Errore eliminazione dati Firestore:", dbError);
+                    // Non fermiamo l'eliminazione dell'account, ma lo segnaliamo.
+                    deleteStatus.textContent = "Errore nell'eliminare i dati, ma procedo con l'eliminazione account.";
+                }
+
+                // 3. Eliminare l'account
+                await deleteUser(user);
+                
+                // onAuthStateChanged gestirà il cambio vista
+                console.log("Account utente eliminato.");
+                // Mostra un messaggio nella schermata di login
+                loginError.textContent = "Account eliminato con successo.";
+                showView('login'); // Forza la vista login
+
+            } catch (error) {
+                console.error("Errore eliminazione account:", error.code);
+                if (error.code === 'auth/wrong-password') {
+                    deleteStatus.textContent = "Password errata. Riprova.";
+                } else if (error.code === 'auth/too-many-requests') {
+                     deleteStatus.textContent = "Troppi tentativi falliti. Riprova più tardi.";
+                } else {
+                    deleteStatus.textContent = "Si è verificato un errore. Riprova.";
+                }
+            }
+        });
+
+        // Listener bottoni Logout
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+            } catch (error) {
+                console.error("Errore logout:", error);
+            }
+            // onAuthStateChanged gestirà il cambio vista
+        }
+        
+        logoutBtn.addEventListener('click', handleLogout);
+        socialLogoutBtn.addEventListener('click', handleLogout);
+
+    </script>
+</body>
+</html>
+
